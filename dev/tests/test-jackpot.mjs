@@ -39,23 +39,21 @@ await page.click('button:has-text("精算結果")');
 await page.waitForTimeout(100);
 
 await page.click('button:has-text("最終ガチャを引く")');
-await page.waitForSelector('button:has-text("ルーレットを回す")');
-await page.click('button:has-text("ルーレットを回す")');
+await page.waitForSelector('button:has-text("ガチャを回す")');
+await page.click('button:has-text("ガチャを回す")');
+await page.waitForSelector('.gm-machine', { timeout: 3000 });
+await page.click('.gm-crank');
+await page.waitForSelector('.gacha-percent-banner', { timeout: 8000 });
+console.log('LOSER BANNER (forced: the last member):', (await page.textContent('.gacha-percent-banner')).replace(/\s+/g, ' ').trim());
+
+// Then the roulette: the last bucket is the 1%-weight, 50%-penalty rare sector.
+await page.click('button:has-text("次へ：罰金の割合を決める")');
 await page.waitForSelector('.rw-wheel.rw-spinning', { timeout: 3000 });
 await page.click('#rw-stop-btn');
-await page.waitForSelector('.gacha-percent-banner', { timeout: 8000 });
-
-const banner = await page.textContent('.gacha-percent-banner');
-console.log('PERCENT BANNER (forced rare draw, expect 50%):', banner.replace(/\s+/g, ' ').trim());
+await page.waitForSelector('.gacha-result-banner', { timeout: 8000 });
 
 const wheelTransform = await page.$eval('#rw-wheel', el => getComputedStyle(el).transform);
 console.log('FINAL WHEEL TRANSFORM:', wheelTransform);
-
-// Proceed through to the loser roulette and confirm the 50%-of-total amount flows through correctly.
-await page.click('button:has-text("次へ：奢っていただく方を決める")');
-await page.waitForSelector('.gm-machine', { timeout: 3000 });
-await page.click('.gm-crank');
-await page.waitForSelector('.gacha-result-banner', { timeout: 8000 });
 const resultBanner = await page.textContent('.gacha-result-banner');
 console.log('RESULT BANNER (expect 50% / ¥5,000):', resultBanner.replace(/\s+/g, ' ').trim());
 

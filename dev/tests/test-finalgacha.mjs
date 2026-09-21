@@ -38,26 +38,25 @@ await page.waitForTimeout(100);
 const balancesBefore = await page.$$eval('.balance-amt', els => els.map(e => e.textContent.trim()));
 console.log('BALANCES BEFORE FINAL GACHA:', JSON.stringify(balancesBefore));
 
-// stage 1: open final gacha, spin the percentage roulette wheel
+// stage 1: open final gacha, pull the gachapon lever (who is picked)
 await page.click('button:has-text("最終ガチャを引く")');
-await page.waitForSelector('button:has-text("ルーレットを回す")');
-await page.click('button:has-text("ルーレットを回す")');
-await page.waitForSelector('.rw-wheel.rw-spinning', { timeout: 3000 });
-const wheelLabels = await page.$$eval('.rw-label', els => els.map(e => e.textContent.trim()));
-console.log('ROULETTE WHEEL LABELS (expect 5%/10%/20%/50%/100%):', JSON.stringify(wheelLabels));
-await page.click('#rw-stop-btn');
-await page.waitForSelector('.gacha-percent-banner', { timeout: 8000 });
-const percentBanner = await page.textContent('.gacha-percent-banner');
-console.log('PERCENT BANNER:', percentBanner.replace(/\s+/g, ' ').trim());
-const percentMatch = percentBanner.match(/【(\d+)%】/);
-const percent = percentMatch ? parseInt(percentMatch[1], 10) : null;
-console.log('DECIDED PERCENT:', percent);
-
-// stage 2: proceed to the loser roulette
-await page.click('button:has-text("次へ：奢っていただく方を決める")');
+await page.waitForSelector('button:has-text("ガチャを回す")');
+await page.click('button:has-text("ガチャを回す")');
 await page.waitForSelector('.gm-machine', { timeout: 3000 });
 await page.click('.gm-crank');
+await page.waitForSelector('.gacha-percent-banner', { timeout: 8000 });
+console.log('LOSER BANNER:', (await page.textContent('.gacha-percent-banner')).replace(/\s+/g, ' ').trim());
+
+// stage 2: proceed to the percentage roulette and stop it
+await page.click('button:has-text("次へ：罰金の割合を決める")');
+await page.waitForSelector('.rw-wheel.rw-spinning', { timeout: 3000 });
+const wheelLabels = await page.$$eval('.rw-label', els => els.map(e => e.textContent.trim()));
+console.log('ROULETTE WHEEL LABELS (expect −20%/1%/5%/10%/20%/50%):', JSON.stringify(wheelLabels));
+await page.click('#rw-stop-btn');
 await page.waitForSelector('.gacha-result-banner', { timeout: 8000 });
+const percentMatch = (await page.textContent('.gacha-result-banner')).match(/合計の(\d+)%/);
+const percent = percentMatch ? parseInt(percentMatch[1], 10) : null;
+console.log('DECIDED PERCENT (absolute value; the 6% comeback case is negative):', percent);
 const banner = await page.textContent('.gacha-result-banner');
 console.log('FINAL GACHA BANNER:', banner.replace(/\s+/g, ' ').trim());
 const breakdown = await page.$$eval('.gacha-breakdown .row2', els => els.map(e => e.textContent.trim()));
@@ -98,11 +97,10 @@ await page.waitForTimeout(100);
 const fgCardAfterReload = await page.textContent('.fg-card');
 console.log('FG CARD AFTER RELOAD:', fgCardAfterReload.replace(/\s+/g, ' ').trim());
 
-// redraw from the card: should restart directly at the spinning percentage roulette
+// redraw from the card: should restart directly at the gachapon
 await page.click('button:has-text("引き直す")');
-await page.waitForSelector('.rw-wheel.rw-spinning', { timeout: 3000 });
-const redrawLabels = await page.$$eval('.rw-label', els => els.map(e => e.textContent.trim()));
-console.log('REDRAW WHEEL LABELS (expect 5%/10%/20%/50%/100% again):', JSON.stringify(redrawLabels));
+await page.waitForSelector('.gm-machine', { timeout: 3000 });
+console.log('REDRAW STARTS AT THE GACHAPON (expect true):', await page.$('.btn-lever-cta') !== null);
 
 // close and test removeFinalGacha instead
 await page.click('.sheet-head button[aria-label="閉じる"]');

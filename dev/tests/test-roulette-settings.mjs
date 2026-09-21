@@ -42,8 +42,8 @@ await page.click('button:has-text("最終ガチャを引く")');
 await page.click('button:has-text("ルーレットの％を設定する")');
 await page.waitForSelector('.rs-row');
 const readRows = () => page.$$eval('.rs-row', els => els.map(r => [r.querySelector('.rs-percent').value, r.querySelector('.rs-weight').value, r.querySelector('.rs-chance').textContent.trim()]));
-check('initial rows are the defaults', (await readRows()).map(r => r.slice(0, 2)), [['1', '9'], ['5', '40'], ['10', '30'], ['20', '20'], ['50', '1']]);
-check('initial chance column', (await readRows()).map(r => r[2]), ['9%', '40%', '30%', '20%', '1%']);
+check('initial rows are the defaults', (await readRows()).map(r => r.slice(0, 2)), [['-20', '6'], ['1', '8'], ['5', '38'], ['10', '28'], ['20', '19'], ['50', '1']]);
+check('initial chance column', (await readRows()).map(r => r[2]), ['6%', '8%', '38%', '28%', '19%', '1%']);
 
 // --- validation: an out-of-range percent is rejected and nothing is saved ---
 await page.fill('.rs-row:nth-child(2) .rs-percent', '0');
@@ -53,8 +53,8 @@ check('still on settings screen after error', await page.$('.rs-row') !== null, 
 
 // --- min items: cannot go below 2 rows ---
 await page.click('button:has-text("初期値に戻す")');
-for (let i = 0; i < 3; i++) await page.click('.rs-row >> nth=0 >> .chip-remove');
-check('3 rows left after deleting 3', (await readRows()).length, 2);
+for (let i = 0; i < 4; i++) await page.click('.rs-row >> nth=0 >> .chip-remove');
+check('2 rows left after deleting 4', (await readRows()).length, 2);
 await page.click('.rs-row >> nth=0 >> .chip-remove');
 check('cannot delete below 2 rows', (await readRows()).length, 2);
 check('min-items error shown', (await page.textContent('#rs-err')).includes('最低2個'), true);
@@ -70,21 +70,25 @@ const setRow = async (i, p, w) => {
 await setRow(0, 10, 1); await setRow(1, 30, 1); await setRow(2, 80, 1);
 check('live chance column updates', (await readRows()).map(r => r[2]), ['33.3%', '33.3%', '33.3%']);
 await page.click('button:has-text("この設定で保存する")');
-await page.waitForSelector('button:has-text("ルーレットを回す")');
+await page.waitForSelector('button:has-text("ガチャを回す")');
 const setupText = await page.textContent('.sheet .lede');
 check('setup text shows the custom percents', setupText.includes('10%・30%・80%'), true);
 
 // --- wheel uses the custom entries, and equal weights mean no "rare" wedge ---
-await page.click('button:has-text("ルーレットを回す")');
+await page.click('button:has-text("ガチャを回す")');
+await page.waitForSelector('.gm-machine');
+await page.click('.gm-crank');
+await page.waitForSelector('.gacha-percent-banner', { timeout: 10000 });
+await page.click('button:has-text("次へ：罰金の割合を決める")');
 await page.waitForSelector('.rw-wheel.rw-spinning');
 check('wheel labels', await page.$$eval('.rw-label', els => els.map(e => e.textContent.trim())), ['10%', '30%', '80%']);
 check('no jackpot label when weights are equal', await page.$$('.rw-label-jackpot').then(a => a.length), 0);
 await page.click('#rw-stop-btn');
-await page.waitForSelector('.gacha-percent-banner', { timeout: 8000 });
-check('forced last-bucket draw lands on 80%', (await page.textContent('.gacha-percent-banner')).includes('【80%】'), true);
-// Once a percentage is on screen the sheet can no longer be closed (that would be a free redraw),
+await page.waitForSelector('.gacha-result-banner', { timeout: 8000 });
+check('forced last-bucket draw lands on 80%', (await page.textContent('.gacha-result-banner')).includes('合計の80%'), true);
+// Once the member is picked the sheet can no longer be closed (that would be a free redraw),
 // so abandon the draw by reloading instead.
-check('no close button after the percentage is decided', (await page.$$('.sheet-head button[aria-label="閉じる"]')).length, 0);
+check('no close button after the draw is decided', (await page.$$('.sheet-head button[aria-label="閉じる"]')).length, 0);
 await page.reload();
 await page.waitForSelector('.appbar-title');
 
@@ -104,7 +108,7 @@ check('custom percents after reload', (await page.textContent('.sheet .lede')).i
 await page.click('button:has-text("ルーレットの％を設定する")');
 await page.click('button:has-text("初期値に戻す")');
 await page.click('button:has-text("この設定で保存する")');
-await page.waitForSelector('button:has-text("ルーレットを回す")');
+await page.waitForSelector('button:has-text("ガチャを回す")');
 check('defaults restored in text', (await page.textContent('.sheet .lede')).includes('1%・5%・10%・20%・50%'), true);
 const savedHash = await page.evaluate(() => location.hash.slice(3));
 const savedState = await page.evaluate(h => {

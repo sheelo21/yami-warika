@@ -227,21 +227,24 @@ await page.click('.chip-remove');
 check('removing below 2 members is refused', (await page.textContent('.err-text')).includes('最低2人'), true);
 check('the member is still there', (await page.$$('.chip-member')).length, 2);
 
-// --- 14. final gacha: no redraw from the result sheet, one redraw after reflecting ---
+// --- 14. final gacha (gachapon first, then roulette): no redraw from the result sheet, one redraw after reflecting ---
 async function drawOnce() {
-  await page.click('#rw-stop-btn');
-  await page.waitForSelector('.gacha-percent-banner', { timeout: 8000 });
-  check('no close button once the percentage is decided', (await page.$$('.sheet-head button[aria-label="閉じる"]')).length, 0);
-  await page.click('button:has-text("次へ")');
   await page.click('.btn-lever-cta');
+  await page.waitForSelector('.gacha-percent-banner', { timeout: 10000 });
+  check('no close button once the member is picked', (await page.$$('.sheet-head button[aria-label="閉じる"]')).length, 0);
+  await page.click('button:has-text("次へ")');
+  await page.waitForSelector('.rw-wheel.rw-spinning');
+  await page.click('#rw-stop-btn');
   await page.waitForSelector('.gacha-result-banner', { timeout: 10000 });
 }
 await openWith({ ...base, m: [{ i: 1, a: 'A' }, { i: 2, a: 'B' }], p: [{ i: 1, y: 1, l: 'x', a: 1000, s: [1, 2] }] });
 await page.waitForSelector('.appbar-title');
 await page.click('button:has-text("精算結果")');
 await page.click('button:has-text("最終ガチャを引く")');
-check('closing is possible before the wheel is stopped', (await page.$$('.sheet-head button[aria-label="閉じる"]')).length, 1);
-await page.click('button:has-text("ルーレットを回す")');
+check('closing is possible before the lever is pulled', (await page.$$('.sheet-head button[aria-label="閉じる"]')).length, 1);
+await page.click('button:has-text("ガチャを回す")');
+await page.waitForSelector('.gm-machine');
+check('closing is possible while the gachapon is idle', (await page.$$('.sheet-head button[aria-label="閉じる"]')).length, 1);
 await drawOnce();
 check('result sheet has no redraw button', (await page.$$('.sheet button:has-text("引き直す")')).length, 0);
 check('result sheet cannot be closed without reflecting', (await page.$$('.sheet-head button[aria-label="閉じる"]')).length, 0);
@@ -250,7 +253,7 @@ await page.waitForTimeout(150);
 check('first draw is counted', (await decodeHash()).g, 1);
 check('one redraw is offered', (await page.textContent('.fg-links')).includes('あと1回'), true);
 await page.click('button:has-text("引き直す")');
-await page.waitForSelector('.rw-wheel.rw-spinning');
+await page.waitForSelector('.gm-machine');
 await drawOnce();
 await page.click('button:has-text("この結果を反映する")');
 await page.waitForTimeout(150);
@@ -271,6 +274,46 @@ for (const chip of await page.$$('.chip-member')) {
 await page.waitForTimeout(100);
 const afterRemove = await decodeHash();
 check('draw counter is reset with the voided result', [afterRemove.fg, afterRemove.g], [undefined, undefined]);
+
+// --- 15. a negative percentage is a comeback: the picked member receives, everyone else pays ---
+// A pays 3,000 for A, B, C (A +2,000, B -1,000, C -1,000); B is picked and the roulette says -20%,
+// i.e. -600: B receives 600 and A and C pay 300 each.
+await openWith({ v: 1, n: 'T', m: [{ i: 1, a: 'A' }, { i: 2, a: 'B' }, { i: 3, a: 'C' }], p: [{ i: 1, y: 1, l: 'x', a: 3000, s: [1, 2, 3] }], d: [], fg: { loser: 2, amount: -600, percent: -20 }, g: 1 });
+await page.waitForSelector('.appbar-title');
+await page.click('button:has-text("精算結果")');
+check('comeback card says so', (await page.textContent('.fg-result-row')).includes('一発逆転！¥600（合計の20%）を受け取り'), true);
+check('comeback balances', await page.$$eval('.balance-amt', els => els.map(e => e.textContent.trim())), ['+¥1,700 受け取り', '-¥400 支払い', '-¥1,300 支払い']);
+check('net balances still sum to zero', (1700 - 400 - 1300), 0);
+// the penalty follows the total for negative percentages too
+await page.click('button:has-text("支払い")');
+await addPayment('A', 'y', 3000, ['A', 'B', 'C']);
+await page.click('button:has-text("精算結果")');
+check('comeback amount follows the new total (-20% of 6,000)', (await page.textContent('.fg-result-row')).includes('¥1,200（合計の20%）'), true);
+
+// the default wheel carries the comeback wedge, labelled with a real minus sign
+await openWith({ ...base, m: [{ i: 1, a: 'A' }, { i: 2, a: 'B' }] });
+await page.waitForSelector('.appbar-title');
+await page.click('button:has-text("精算結果")');
+await page.click('button:has-text("最終ガチャを引く")');
+await page.click('button:has-text("ガチャを回す")');
+await page.waitForSelector('.gm-machine');
+await page.click('.btn-lever-cta');
+await page.waitForSelector('.gacha-percent-banner', { timeout: 10000 });
+await page.click('button:has-text("次へ")');
+await page.waitForSelector('.rw-wheel.rw-spinning');
+check('default wheel has one comeback label', await page.$$eval('.rw-label-lucky', els => els.map(e => e.textContent.trim())), ['\u221220%']);
+
+// the settings form accepts a negative percentage and saves it
+await openWith({ ...base, m: [{ i: 1, a: 'A' }, { i: 2, a: 'B' }] });
+await page.waitForSelector('.appbar-title');
+await page.click('button:has-text("精算結果")');
+await page.click('button:has-text("最終ガチャを引く")');
+await page.click('button:has-text("ルーレットの％を設定する")');
+await page.fill('.rs-row >> nth=0 >> .rs-percent', '-30');
+await page.click('button:has-text("この設定で保存する")');
+await page.waitForSelector('button:has-text("ガチャを回す")');
+check('negative percentage saved', (await decodeHash()).r[0], [-30, 6]);
+check('setup text lists it', (await page.textContent('.sheet .lede')).includes('-30%・1%'), true);
 
 check('no page errors', errors, []);
 console.log(failures ? 'FAILURES: ' + failures : 'ALL PASSED');
