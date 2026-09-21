@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const file = 'file://' + path.resolve(here, '../../index.html');
 
-const launchOpts = fs.existsSync('/opt/pw-browsers/chromium-1194/chrome-linux/chrome') ? { executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' } : {};
+const launchOpts = fs.existsSync('/opt/pw-browsers/chromium-1194/chrome-linux/chrome') ? { executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' } : (process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {});
 const browser = await chromium.launch(launchOpts);
 const page = await browser.newPage();
 const errors = [];
@@ -78,7 +78,7 @@ const settleText = await page.textContent('.container');
 console.log('CONTAINS 26,000:', settleText.includes('26,000'));
 console.log('CONTAINS 10,000:', settleText.includes('10,000'));
 console.log('CONTAINS 2,000 :', settleText.includes('2,000'));
-console.log('CONTAINS 最少3件:', settleText.includes('最少3件'));
+console.log('CONTAINS 3件で精算:', settleText.includes('3件で精算'));
 
 // mark a transfer done
 const doneBtn = await page.$('.done-btn');

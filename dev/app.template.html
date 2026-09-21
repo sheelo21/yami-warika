@@ -3,59 +3,60 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#151009">
+<meta name="theme-color" content="#F7F8FA">
 <title>闇ワリカ</title>
+<meta name="description" content="飲み会や旅行の割り勘を記録して、最後は運命のルーレット＆ガチャで清算するWebアプリです。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="闇ワリカ">
+<meta property="og:description" content="飲み会や旅行の割り勘を記録して、最後は運命のルーレット＆ガチャで清算するWebアプリです。">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rampart+One&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap">
 <style>
+  /* 藍（Ai / Indigo Minimal）— light mode only. Thin 1px rules and whitespace, no shadows;
+     the single accent colour carries every function. */
   :root {
-    --bg: oklch(14% 0.018 35);
-    --surface: oklch(19% 0.024 32);
-    --surface-2: oklch(24.5% 0.028 32);
-    --border: oklch(33% 0.03 55);
-    --card-border: oklch(45% 0.05 82 / 0.28);
-    --text: oklch(95% 0.014 75);
-    --text-secondary: oklch(75% 0.02 65);
-    --text-tertiary: oklch(55% 0.02 55);
-    --gold: oklch(80% 0.12 84);
-    --accent: oklch(50% 0.19 24);
-    --accent-soft: oklch(30% 0.045 80);
-    --accent-text: var(--gold);
-    --success-soft: oklch(27% 0.05 155);
-    --success-text: oklch(74% 0.13 152);
-    --warn-soft: oklch(28% 0.075 25);
-    --warn-text: oklch(76% 0.17 27);
-    --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.5);
-    --shadow-2: 0 10px 26px oklch(0% 0 0 / 0.55);
-    --overlay: oklch(0% 0 0 / 0.72);
-    --toast-bg: oklch(21% 0.035 30);
-    --toast-text: oklch(95% 0.014 75);
+    --bg: #F7F8FA;
+    --surface: #FFFFFF;
+    --ink: #21262E;
+    --muted: #6B7280;
+    --line: #CDD2D9;
+    --accent: #2B4C7E;
+    --accent-ink: #FFFFFF;
+    --success: #2E6E63;
+    --warning: #8C6A20;
+    --danger: #DC2626;
+    --accent-soft: color-mix(in srgb, var(--accent) 10%, var(--surface));
+    --success-soft: color-mix(in srgb, var(--success) 17%, var(--surface));
+    --success-ink: color-mix(in srgb, var(--success) 22%, #000);
+    --warning-soft: color-mix(in srgb, var(--warning) 17%, var(--surface));
+    --warning-ink: color-mix(in srgb, var(--warning) 22%, #000);
+    --danger-soft: color-mix(in srgb, var(--danger) 16%, var(--surface));
+    --danger-ink: color-mix(in srgb, var(--danger) 22%, #000);
+    --font-body: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    --font-num: 'Roboto', 'Noto Sans JP', sans-serif;
   }
 
-  :root { color-scheme: dark; }
+  :root { color-scheme: light; }
   * { box-sizing: border-box; }
+  html { font-size: 18px; }
   html, body { margin: 0; padding: 0; }
   body {
     background: var(--bg);
-    color: var(--text);
-    font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    position: relative;
-  }
-  body::before {
-    content: '';
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background:
-      radial-gradient(ellipse 120% 55% at 50% -8%, oklch(38% 0.07 30 / 0.5), transparent 62%),
-      repeating-linear-gradient(135deg, oklch(100% 0 0 / 0.014) 0 2px, transparent 2px 26px);
   }
   #app, #toast-root { position: relative; z-index: 1; }
-  a { color: var(--accent-text); }
+  a { color: var(--accent); }
   button, input, select { font-family: inherit; }
-  h1, h2, h3 { font-family: 'Rampart One', 'Hiragino Maru Gothic ProN', 'Yu Gothic', sans-serif; margin: 0; text-wrap: balance; letter-spacing: 0.02em; }
-  .num { font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif; font-weight: 700; font-variant-numeric: tabular-nums; }
-  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  h1, h2, h3 { font-family: var(--font-body); font-weight: 700; margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+  .num { font-family: var(--font-num); font-weight: 700; font-variant-numeric: tabular-nums; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   }
@@ -65,187 +66,171 @@
   .appbar {
     position: sticky; top: 0; z-index: 10;
     display: flex; align-items: center; gap: 10px;
-    padding: 16px 20px; background: var(--bg);
-    border-bottom: 1px solid oklch(50% 0.08 80 / 0.22);
-    box-shadow: 0 1px 0 oklch(0% 0 0 / 0.4);
+    padding: 0.7rem 1.1rem; background: var(--surface);
+    border-bottom: 1px solid var(--line);
   }
   .brand { display: flex; align-items: center; gap: 8px; }
   .brand-mark { width: 30px; height: 20px; position: relative; flex: 0 0 auto; }
-  .brand-mark span {
-    position: absolute; top: 0; width: 20px; height: 20px; border-radius: 50%;
-    box-shadow: 0 0 0 1.5px var(--gold) inset, 0 1px 3px oklch(0% 0 0 / 0.5);
-  }
-  .brand-mark span:first-child { left: 0; background: repeating-conic-gradient(oklch(56% 0.19 24) 0deg 30deg, oklch(34% 0.13 22) 30deg 60deg); }
-  .brand-mark span:last-child { left: 9px; background: repeating-conic-gradient(var(--gold) 0deg 30deg, oklch(48% 0.06 70) 30deg 60deg); }
-  .brand-name {
-    font-family: 'Rampart One', 'Hiragino Maru Gothic ProN', sans-serif; font-weight: 400; font-size: 19px; letter-spacing: 0.03em;
-    color: oklch(93% 0.1 86); -webkit-text-stroke: 0.4px oklch(93% 0.1 86);
-    text-shadow: 0 0 14px oklch(80% 0.14 84 / 0.55), 0 1px 2px oklch(0% 0 0 / 0.6);
-  }
-  .appbar-title { flex: 1; min-width: 0; font-weight: 700; font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .brand-mark span { position: absolute; top: 0; width: 20px; height: 20px; border-radius: 50%; }
+  .brand-mark span:first-child { left: 0; background: var(--accent); }
+  .brand-mark span:last-child { left: 10px; background: var(--accent-soft); border: 1px solid var(--accent); }
+  .brand-name { font-weight: 700; font-size: 1.05rem; letter-spacing: 0.04em; }
+  .appbar-title { flex: 1; min-width: 0; font-weight: 700; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .iconbtn {
-    flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%;
+    flex: 0 0 auto; width: 40px; height: 40px; border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
-    background: transparent; border: none; color: var(--text-secondary); cursor: pointer;
+    background: transparent; border: none; color: var(--muted); cursor: pointer;
   }
-  .iconbtn:hover { background: var(--surface-2); color: var(--text); }
+  .iconbtn:hover { background: var(--accent-soft); color: var(--accent); }
   .reset-btn {
     flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
-    background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 3px 7px; border-radius: 10px;
+    background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 3px 7px; border-radius: 6px;
   }
-  .reset-btn:hover { background: var(--surface-2); color: var(--text); }
-  .reset-btn span { font-size: 9px; font-weight: 700; letter-spacing: 0.02em; }
+  .reset-btn:hover { background: var(--accent-soft); color: var(--accent); }
+  .reset-btn span { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.02em; }
 
-  .container { flex: 1; display: flex; flex-direction: column; gap: 18px; padding: 20px 20px 12px; }
+  .container { flex: 1; display: flex; flex-direction: column; gap: 1.2rem; padding: 1.2rem 1.1rem 0.8rem; }
 
-  .card { background: var(--surface); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; box-shadow: var(--shadow-1), var(--shadow-2); }
-  .card-flat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 1rem; }
+  .card-flat { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem 0.9rem; }
 
-  .lede { color: oklch(80% 0.025 60); font-size: 14px; line-height: 1.7; font-style: italic; }
+  .lede { color: var(--muted); font-size: 0.8rem; line-height: 1.8; }
 
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field label { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); }
+  .field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .field > label { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
   .input {
-    width: 100%; padding: 11px 13px; border-radius: 12px;
-    border: 1px solid var(--border); background: var(--surface);
-    color: var(--text); font-size: 15px;
+    width: 100%; padding: 0.6rem 0.75rem; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--surface);
+    color: var(--ink); font-size: 1rem;
   }
-  .input::placeholder { color: var(--text-tertiary); }
-  select.input { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b8935a' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; }
-  select.input option { background: oklch(19% 0.024 32); color: oklch(95% 0.014 75); }
+  .input::placeholder { color: var(--muted); opacity: 0.7; }
+  .input:focus { border-color: var(--accent); }
+  select.input { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; }
+  select.input option { background: #FFFFFF; color: #21262E; }
 
   .row { display: flex; align-items: center; gap: 8px; }
   .rows { display: flex; flex-direction: column; gap: 8px; }
 
   .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-    border: 1px solid transparent; border-radius: 13px; padding: 12px 17px; font-weight: 700; font-size: 15px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+    border: 1px solid transparent; border-radius: 6px; padding: 0.65rem 1rem; font-weight: 700; font-size: 0.9rem;
     cursor: pointer;
   }
-  .btn-primary {
-    background: linear-gradient(180deg, oklch(57% 0.19 26), oklch(46% 0.18 22));
-    color: oklch(98% 0.01 80); border-color: oklch(70% 0.14 32 / 0.45);
-    box-shadow: 0 8px 18px oklch(50% 0.19 24 / 0.4), inset 0 1px 0 oklch(100% 0 0 / 0.15);
-  }
-  .btn-primary:hover { filter: brightness(1.08); }
-  .btn-secondary { background: var(--surface-2); color: var(--gold); border-color: oklch(60% 0.09 82 / 0.5); }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn-primary:hover { background: color-mix(in srgb, var(--accent) 88%, #000); }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+  .btn-secondary { background: transparent; color: var(--ink); border-color: var(--line); }
+  .btn-secondary:hover { background: var(--accent-soft); }
   .btn-block { width: 100%; }
-  .btn-lever-cta { padding: 11px 22px; animation: lever-blink 1.1s ease-in-out infinite; }
-  @keyframes lever-blink {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 oklch(80% 0.12 84 / 0); }
-    50% { opacity: 0.6; box-shadow: 0 0 14px oklch(80% 0.12 84 / 0.5); }
-  }
-  .btn-sm { padding: 7px 13px; font-size: 13px; border-radius: 10px; }
-  .btn-text { background: none; border: none; color: var(--accent-text); font-weight: 700; font-size: 13px; cursor: pointer; padding: 6px 2px; display: inline-flex; align-items: center; gap: 4px; }
-  .err-text { color: var(--warn-text); font-size: 12.5px; min-height: 1em; }
+  .btn-lever-cta { padding: 0.65rem 1.2rem; animation: lever-blink 1.4s ease-in-out infinite; }
+  @keyframes lever-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+  .btn-sm { padding: 0.45rem 0.8rem; font-size: 0.8rem; border-radius: 6px; }
+  .btn-text { background: none; border: none; color: var(--accent); font-weight: 700; font-size: 0.8rem; cursor: pointer; padding: 0.45rem 0.15rem; display: inline-flex; align-items: center; gap: 4px; }
+  .err-text { color: var(--danger); font-size: 0.75rem; min-height: 1em; }
 
-  .badge { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 11px; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
-  .badge-accent { background: var(--accent-soft); color: var(--accent-text); }
-  .badge-success { background: var(--success-soft); color: var(--success-text); }
-  .badge-warn { background: var(--warn-soft); color: var(--warn-text); }
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 999px; white-space: nowrap; }
+  .badge-accent { background: var(--accent-soft); color: var(--accent); }
+  .badge-success { background: var(--success-soft); color: var(--success-ink); }
+  .badge-warn { background: var(--warning-soft); color: var(--warning-ink); }
 
-  .avatar { border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex: 0 0 auto; box-shadow: 0 0 0 2px var(--gold) inset, 0 2px 4px oklch(0% 0 0 / 0.4); }
+  .avatar { border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--accent); color: var(--accent-ink); font-weight: 700; flex: 0 0 auto; }
 
   .chips { display: flex; flex-wrap: wrap; gap: 12px; }
   .chip-member { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 56px; }
-  .chip-member .name { font-size: 11px; color: var(--text-secondary); max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .chip-remove { border: none; background: var(--surface-2); color: var(--text-tertiary); border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: -14px; margin-left: 28px; }
-
+  .chip-member .name { font-size: 0.7rem; color: var(--muted); max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chip-remove { position: relative; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: -14px; margin-left: 28px; }
+  /* The visible × stays small, but the touchable area reaches 8px beyond it on every side. */
+  .chip-remove::after { content: ''; position: absolute; inset: -8px; }
   .addmember-row { display: flex; gap: 8px; align-items: center; }
-  .addmember-row .input { flex: 1; padding: 9px 12px; font-size: 13.5px; }
+  .addmember-row .input { flex: 1; padding: 0.5rem 0.75rem; }
 
-  .tabbar { display: flex; gap: 4px; background: var(--surface-2); border-radius: 999px; padding: 4px; }
-  .tab { flex: 1; text-align: center; padding: 9px 10px; border-radius: 999px; font-weight: 700; font-size: 13.5px; color: var(--text-secondary); cursor: pointer; border: none; background: none; }
-  .tab.active { background: var(--surface); color: var(--gold); box-shadow: var(--shadow-1); }
+  .tabbar { display: flex; gap: 4px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  .tab { flex: 1; text-align: center; padding: 0.55rem 0.6rem; border-radius: 6px; font-weight: 700; font-size: 0.85rem; color: var(--muted); cursor: pointer; border: none; background: none; }
+  .tab.active { background: var(--accent-soft); color: var(--accent); }
 
-  .paycard { display: flex; align-items: center; gap: 12px; }
-  .paycard .meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-  .paycard .label { font-weight: 700; font-size: 14px; }
-  .paycard .sub { font-size: 11.5px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .paycard .amt { font-weight: 900; font-size: 15px; white-space: nowrap; }
-  .icon-danger { color: var(--text-tertiary); background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; flex: 0 0 auto; }
-  .icon-danger:hover { color: var(--warn-text); background: var(--warn-soft); }
-  .icon-disabled { color: var(--text-tertiary); opacity: 0.5; padding: 6px; flex: 0 0 auto; }
+  .paycard { display: flex; align-items: center; gap: 8px; }
+  /* keep-all: wrap only at the spaces around "・", never in the middle of "4人で割り勘". */
+  .paycard .meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; word-break: keep-all; overflow-wrap: anywhere; }
+  .paycard .label { font-weight: 700; font-size: 0.9rem; }
+  .paycard .sub { font-size: 0.72rem; line-height: 1.5; color: var(--muted); }
+  .paycard .amt { font-weight: 700; font-size: 0.9rem; white-space: nowrap; }
+  .icon-danger, .icon-edit { color: var(--muted); background: none; border: none; cursor: pointer; padding: 10px; border-radius: 6px; flex: 0 0 auto; }
+  .icon-danger:hover { color: var(--danger); background: var(--danger-soft); }
+  .icon-edit:hover { color: var(--accent); background: var(--accent-soft); }
+  .icon-disabled { color: var(--muted); opacity: 0.55; width: 18px; height: 18px; align-items: center; justify-content: center; flex: 0 0 auto; }
 
-  .empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 34px 14px; color: var(--text-secondary); text-align: center; font-size: 13.5px; font-style: italic; }
-  .empty svg { color: var(--text-tertiary); }
+  .empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 2.2rem 0.9rem; color: var(--muted); text-align: center; font-size: 0.85rem; line-height: 1.7; }
+  .empty svg { color: var(--muted); }
 
   .balance-row { display: flex; align-items: center; gap: 10px; }
-  .balance-row .name { flex: 1; font-weight: 500; font-size: 13.5px; }
-  .balance-amt { font-weight: 900; font-size: 14px; }
-  .balance-amt.pos { color: var(--success-text); }
-  .balance-amt.neg { color: var(--warn-text); }
-  .balance-amt.zero { color: var(--text-tertiary); }
+  .balance-row .name { flex: 1; font-weight: 500; font-size: 0.85rem; }
+  .balance-amt { font-weight: 700; font-size: 0.85rem; }
+  .balance-amt.pos { color: var(--success); }
+  .balance-amt.neg { color: var(--danger); }
+  .balance-amt.zero { color: var(--muted); }
 
   .transfer-card { display: flex; flex-direction: column; gap: 10px; }
   .transfer-top { display: flex; align-items: center; gap: 8px; }
-  .transfer-name { font-weight: 700; font-size: 13px; }
-  .transfer-amt { margin-left: auto; font-weight: 900; font-size: 15px; }
-  .done-btn { display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--accent-soft); color: var(--accent-text); background: none; }
-  .done-btn.is-done { background: var(--success-soft); color: var(--success-text); border-color: var(--success-soft); }
+  .transfer-name { font-weight: 700; font-size: 0.8rem; }
+  .transfer-amt { margin-left: auto; font-weight: 700; font-size: 0.9rem; }
+  .done-btn { display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 6px; padding: 0.55rem; font-size: 0.78rem; font-weight: 700; cursor: pointer; border: 1px solid var(--line); color: var(--accent); background: none; }
+  .done-btn:hover { background: var(--accent-soft); }
+  .done-btn.is-done { background: var(--success-soft); color: var(--success-ink); border-color: var(--success-soft); }
 
-  .fg-card { display: flex; flex-direction: column; gap: 12px; border: 1.5px dashed var(--gold); border-radius: 16px; padding: 14px; background: oklch(27% 0.05 78); }
+  .fg-card { display: flex; flex-direction: column; gap: 12px; border: 1px solid var(--line); border-radius: 8px; padding: 0.9rem; background: var(--accent-soft); }
   .fg-head { display: flex; align-items: center; gap: 8px; }
-  .fg-head h3 { font-size: 14px; }
+  .fg-head h3 { font-size: 0.85rem; }
   .fg-result-row { display: flex; align-items: center; gap: 10px; }
-  .fg-result-row .name { flex: 1; font-weight: 700; font-size: 13.5px; }
+  .fg-result-row .name { flex: 1; font-weight: 700; font-size: 0.8rem; }
   .fg-links { display: flex; gap: 16px; justify-content: center; }
 
-  .sticky-bottom { position: sticky; bottom: 0; padding: 14px 20px calc(14px + env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg) 55%, transparent); }
+  .sticky-bottom { position: sticky; bottom: 0; padding: 0.8rem 1.1rem calc(0.8rem + env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--line); }
 
   .gacha-percent-banner {
     display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
-    background: oklch(30% 0.06 84);
-    border: 1px solid var(--gold); color: var(--text); border-radius: 16px; padding: 16px;
-    box-shadow: 0 0 20px oklch(78% 0.14 84 / 0.2) inset, 0 4px 14px oklch(0% 0 0 / 0.4);
+    background: var(--accent-soft); border: 1px solid var(--accent); color: var(--ink); border-radius: 8px; padding: 1rem;
   }
-  .gacha-percent-banner .headline { font-family: 'Rampart One', sans-serif; font-weight: 400; font-size: 17px; color: var(--gold); text-shadow: 0 0 10px currentColor; }
-  .gacha-percent-banner .sub { font-size: 12px; font-weight: 600; color: oklch(88% 0.02 75); }
+  .gacha-percent-banner .headline { font-weight: 700; font-size: 1rem; color: var(--accent); }
+  .gacha-percent-banner .sub { font-size: 0.75rem; font-weight: 500; color: var(--muted); }
 
   .gacha-summary { text-align: center; display: flex; flex-direction: column; gap: 2px; }
-  .gacha-summary .label { font-weight: 700; font-size: 15px; }
-  .gacha-summary .amt { font-weight: 900; font-size: 20px; color: var(--gold); }
-  .gacha-stage-text { text-align: center; font-weight: 700; font-size: 13.5px; color: var(--text-secondary); }
+  .gacha-summary .label { font-weight: 700; font-size: 0.85rem; }
+  .gacha-summary .amt { font-weight: 700; font-size: 1.2rem; color: var(--accent); }
+  .gacha-stage-text { text-align: center; font-weight: 700; font-size: 0.8rem; color: var(--muted); }
 
   /* ---------- gachapon machine ---------- */
   .gm-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
   .gm-machine { display: flex; flex-direction: column; align-items: center; }
   .gm-dome {
     position: relative; width: 220px; min-height: 120px; border-radius: 110px 110px 18px 18px;
-    background: linear-gradient(180deg, oklch(48% 0.02 70 / 0.4), oklch(28% 0.02 60 / 0.32));
-    border: 2px solid oklch(62% 0.05 78 / 0.6);
+    background: var(--accent-soft); border: 1px solid var(--line);
     display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 6px;
-    padding: 16px 14px 10px; box-shadow: inset 0 -8px 16px oklch(0% 0 0 / 0.25), inset 0 6px 10px oklch(100% 0 0 / 0.2);
+    padding: 16px 14px 10px;
   }
   .gm-dome.shaking { animation: gm-shake 0.32s ease-in-out infinite; }
   .gm-capsule {
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-family: 'Rampart One', sans-serif; font-weight: 400; color: white; text-shadow: 0 1px 1px oklch(0% 0 0 / 0.25);
-    box-shadow: 0 1px 2px oklch(0% 0 0 / 0.3), 0 0 0 1.5px oklch(80% 0.12 84 / 0.4) inset;
+    font-weight: 700; color: #FFFFFF; border: 1px solid rgba(255, 255, 255, 0.6);
     animation: gm-jiggle 1.8s ease-in-out infinite;
   }
   .gm-capsule.gm-capsule-gone { opacity: 0; transform: scale(0.4); transition: opacity 0.3s ease, transform 0.3s ease; animation: none; }
   .gm-body {
-    position: relative; width: 168px; margin-top: -8px; padding: 14px 14px 16px; border-radius: 0 0 20px 20px;
-    background: linear-gradient(180deg, oklch(46% 0.18 22), oklch(30% 0.12 20));
-    border: 1px solid oklch(55% 0.1 60 / 0.5); border-top: none;
+    position: relative; width: 168px; margin-top: -8px; padding: 14px 14px 16px; border-radius: 0 0 8px 8px;
+    background: var(--accent); border: 1px solid var(--accent); border-top: none;
     display: flex; flex-direction: column; align-items: center; gap: 12px;
-    box-shadow: 0 6px 18px oklch(0% 0 0 / 0.5), inset 0 1px 0 oklch(100% 0 0 / 0.08);
   }
   .gm-crank {
-    width: 46px; height: 46px; border-radius: 50%; border: 1px solid oklch(55% 0.09 70 / 0.6); cursor: pointer;
-    background: radial-gradient(circle at 32% 28%, oklch(92% 0.08 84), oklch(68% 0.11 78));
+    width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); cursor: pointer;
+    background: var(--surface);
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 5px oklch(0% 0 0 / 0.45);
   }
   .gm-crank:disabled { cursor: default; opacity: 0.9; }
   .gm-crank-knob { width: 8px; height: 20px; border-radius: 4px; background: var(--accent); display: block; }
   .gm-crank.spinning .gm-crank-knob { animation: gm-crank-spin 0.32s linear infinite; }
   .gm-slot {
-    width: 100%; height: 58px; border-radius: 10px; background: oklch(10% 0.02 25 / 0.65);
-    border: 1px solid oklch(40% 0.06 25 / 0.6);
+    width: 100%; height: 58px; border-radius: 6px; background: color-mix(in srgb, var(--accent) 55%, #000);
+    border: 1px solid color-mix(in srgb, var(--accent) 70%, #000);
     display: flex; align-items: center; justify-content: center; overflow: visible;
-    box-shadow: inset 0 3px 6px oklch(0% 0 0 / 0.5);
   }
   .gm-capsule-drop { position: relative; width: 52px; height: 52px; animation: gm-drop-in 0.5s cubic-bezier(.34,1.56,.64,1) both; }
   .gm-shell-top, .gm-shell-bottom {
@@ -281,88 +266,85 @@
   .rw-wrap { position: relative; width: 220px; height: 220px; margin: 10px auto 6px; }
   .rw-wheel {
     position: absolute; inset: 0; border-radius: 50%;
-    border: 4px solid var(--gold);
-    box-shadow: 0 8px 20px oklch(0% 0 0 / 0.5), inset 0 0 0 2px oklch(0% 0 0 / 0.35);
+    border: 3px solid var(--accent);
   }
   .rw-wheel.rw-spinning { animation: rw-spin 0.8s linear infinite; }
   @keyframes rw-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   .rw-label {
     position: absolute; top: 50%; left: 50%; width: 44px; height: 20px; margin: -10px 0 0 -22px;
     display: flex; align-items: center; justify-content: center;
-    color: white; font-weight: 900; font-size: 14px; text-shadow: 0 1px 2px oklch(0% 0 0 / 0.6);
+    color: #FFFFFF; font-family: var(--font-num); font-weight: 700; font-size: 0.8rem;
     pointer-events: none;
   }
-  .rw-label-jackpot {
-    width: 34px; margin-left: -17px; font-size: 11.5px; color: oklch(95% 0.05 90);
-    text-shadow: 0 0 5px oklch(70% 0.2 25 / 0.9), 0 1px 2px oklch(0% 0 0 / 0.7);
-  }
+  .rw-label-jackpot { width: 34px; margin-left: -17px; font-size: 0.65rem; }
   .rw-pointer {
     position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
     width: 0; height: 0; border-left: 11px solid transparent; border-right: 11px solid transparent;
-    border-top: 18px solid var(--gold); filter: drop-shadow(0 2px 3px oklch(0% 0 0 / 0.5));
+    border-top: 18px solid var(--ink);
     z-index: 2;
   }
   .rw-hub {
     position: absolute; top: 50%; left: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px;
-    border-radius: 50%; background: radial-gradient(circle at 35% 30%, oklch(92% 0.08 84), oklch(68% 0.11 78));
-    box-shadow: 0 0 0 2px oklch(0% 0 0 / 0.4), 0 2px 4px oklch(0% 0 0 / 0.5);
+    border-radius: 50%; background: var(--surface); border: 2px solid var(--accent);
     z-index: 1;
   }
 
   .gacha-result-banner {
     display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
-    background: oklch(30% 0.08 25);
-    border: 1px solid var(--warn-text); color: var(--text); border-radius: 16px; padding: 16px;
-    box-shadow: 0 0 20px oklch(60% 0.18 25 / 0.25) inset, 0 4px 14px oklch(0% 0 0 / 0.4);
+    background: var(--danger-soft); border: 1px solid var(--danger); color: var(--ink); border-radius: 8px; padding: 1rem;
   }
-  .gacha-result-banner .headline { font-family: 'Rampart One', sans-serif; font-weight: 400; font-size: 17px; color: var(--warn-text); text-shadow: 0 0 10px currentColor; }
-  .gacha-result-banner .roast { font-size: 12px; font-weight: 500; color: oklch(88% 0.02 60); font-style: italic; }
+  .gacha-result-banner .headline { font-weight: 700; font-size: 1rem; color: var(--danger-ink); line-height: 1.6; }
+  .gacha-result-banner .roast { font-size: 0.75rem; font-weight: 500; color: var(--muted); line-height: 1.7; }
   .gacha-breakdown { display: flex; flex-direction: column; gap: 6px; }
-  .gacha-breakdown .row2 { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
-  .gacha-breakdown .row2 .nm { flex: 1; color: var(--text-secondary); }
+  .gacha-breakdown .row2 { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
+  .gacha-breakdown .row2 .nm { flex: 1; color: var(--muted); }
   .gacha-breakdown .row2 .sh { font-weight: 700; }
 
   .hint {
-    display: flex; gap: 10px; align-items: flex-start; background: oklch(28% 0.05 78); color: oklch(92% 0.02 75);
-    border-left: 3px solid var(--gold); border-radius: 8px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6; font-style: italic;
+    display: flex; gap: 10px; align-items: flex-start; background: var(--accent-soft); color: var(--ink);
+    border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 6px; padding: 0.7rem 0.85rem; font-size: 0.78rem; line-height: 1.7;
   }
-  .hint svg { flex: 0 0 auto; margin-top: 1px; }
-  .hint-close { margin-left: auto; background: none; border: none; color: inherit; opacity: 0.6; cursor: pointer; flex: 0 0 auto; }
+  .hint svg { flex: 0 0 auto; margin-top: 1px; color: var(--accent); }
+  .hint-close { margin-left: auto; background: none; border: none; color: var(--muted); cursor: pointer; flex: 0 0 auto; }
 
   .overlay {
-    position: fixed; inset: 0; background: var(--overlay); z-index: 50;
+    position: fixed; inset: 0; background: rgba(33, 38, 46, 0.45); z-index: 50;
     display: flex; align-items: flex-end; justify-content: center; padding: 0;
   }
   .sheet {
-    width: 100%; max-width: 480px; background: var(--bg); border-radius: 22px 22px 0 0;
-    padding: 18px 20px calc(20px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 16px;
+    width: 100%; max-width: 480px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px 8px 0 0;
+    padding: 1.1rem 1.1rem calc(1.2rem + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 1rem;
     max-height: 88dvh; overflow-y: auto;
   }
   @media (min-width: 540px) {
     .overlay { align-items: center; }
-    .sheet { border-radius: 22px; max-height: 80dvh; }
+    .sheet { border-radius: 8px; max-height: 80dvh; }
   }
   .sheet-head { display: flex; align-items: center; gap: 10px; }
-  .sheet-head h2 { flex: 1; font-size: 17px; }
+  .sheet-head h2 { flex: 1; font-size: 1rem; }
 
-  .qrbox { background: white; border-radius: 16px; padding: 16px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--gold); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .qrbox { background: #FFFFFF; border-radius: 8px; padding: 16px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line); }
   .qrbox svg { width: 176px; height: 176px; display: block; }
 
-  .linkrow { display: flex; gap: 8px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; }
-  .linkrow input { flex: 1; border: none; background: none; color: var(--text-secondary); font-size: 12px; font-family: monospace; outline: none; min-width: 0; }
+  .linkrow { display: flex; gap: 8px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 0.5rem 0.7rem; }
+  .linkrow input { flex: 1; border: none; background: none; color: var(--muted); font-size: 0.7rem; font-family: monospace; outline: none; min-width: 0; }
 
   #toast-root { position: fixed; left: 0; right: 0; bottom: calc(86px + env(safe-area-inset-bottom)); display: flex; justify-content: center; z-index: 80; pointer-events: none; }
   .toast {
-    pointer-events: auto; display: flex; align-items: center; gap: 10px; background: var(--toast-bg); color: var(--toast-text);
-    padding: 12px 16px; border-radius: 999px; font-size: 13px; font-weight: 500; max-width: calc(100vw - 40px);
-    border: 1px solid oklch(60% 0.09 82 / 0.4);
-    box-shadow: var(--shadow-2); animation: toast-in 0.18s ease-out;
+    pointer-events: auto; display: flex; align-items: center; gap: 10px; background: var(--ink); color: #FFFFFF;
+    padding: 0.7rem 1rem; border-radius: 6px; font-size: 0.78rem; font-weight: 500; line-height: 1.6; max-width: calc(100vw - 32px);
+    animation: toast-in 0.18s ease-out;
   }
-  .toast button { background: none; border: none; color: inherit; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .toast button { background: none; border: none; color: #FFFFFF; font-weight: 700; font-size: 0.78rem; text-decoration: underline; cursor: pointer; white-space: nowrap; padding: 6px 4px; }
   @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-  .divider-text { display: flex; align-items: center; gap: 10px; color: var(--text-tertiary); font-size: 11px; }
-  .divider-text .line { flex: 1; height: 1px; background: var(--border); }
+  .divider-text { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 0.7rem; }
+  .divider-text .line { flex: 1; height: 1px; background: var(--line); }
+
+  /* ---------- roulette settings form ---------- */
+  .rs-grid { display: grid; grid-template-columns: 1fr 1fr 58px 30px; gap: 8px; align-items: center; }
+  .rs-head { font-size: 0.7rem; font-weight: 700; color: var(--muted); }
+  .rs-chance { font-size: 0.8rem; color: var(--accent); text-align: right; }
 </style>
 </head>
 <body>
@@ -377,14 +359,17 @@
 (function () {
   'use strict';
 
-  var HUES = [40, 155, 280, 200, 320, 95, 10, 240];
-  function hueForId(id) { return HUES[Math.abs(id - 1) % HUES.length]; }
+  // 藍 uses one colour only, so members are told apart by their initial, not by hue. The gacha
+  // capsules and wheel sectors just vary the strength of the accent so neighbours differ.
+  var TINTS = [100, 84, 70];
+  function accentTint(n) { return 'color-mix(in srgb, var(--accent) ' + TINTS[Math.abs(n) % TINTS.length] + '%, #fff)'; }
 
   var ICONS = {
     plus: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
     back: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
     reset: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
     share: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.7l7.6-4.4M8.2 13.3l7.6 4.4"/></svg>',
+    edit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg>',
     trash: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg>',
     lock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
     close: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
@@ -422,38 +407,67 @@
   // each with a relative weight (need not sum to 100 — normalized at draw time, though they
   // do here for readability). Whichever entry has the lowest weight is treated as the rare
   // "jackpot" draw and gets a distinct color/label treatment on the wheel.
-  var FG_ROULETTE = [
+  var FG_ROULETTE_DEFAULT = [
     { percent: 1, weight: 9 },
     { percent: 5, weight: 40 },
     { percent: 10, weight: 30 },
     { percent: 20, weight: 20 },
     { percent: 50, weight: 1 }
   ];
-  var FG_PERCENTS = FG_ROULETTE.map(function (r) { return r.percent; });
+  var FG_MIN_ITEMS = 2, FG_MAX_ITEMS = 8;
+  var MAX_AMOUNT = 999999999999;
+  // The gacha can be reflected into the books this many times per event: the first draw plus
+  // one redraw. Undoing a result ("取り消す") does not give the draws back.
+  var FG_MAX_DRAWS = 2;
+
+  // Each event may carry its own roulette as state.r = [[percent, weight], ...] (set from
+  // the final gacha's "ルーレットの設定"). The value comes from the share URL, so it is
+  // validated here and anything malformed quietly falls back to the defaults.
+  function sanitizeRoulette(r) {
+    if (!Array.isArray(r) || r.length < FG_MIN_ITEMS || r.length > FG_MAX_ITEMS) return null;
+    var out = [];
+    for (var i = 0; i < r.length; i++) {
+      var e = r[i];
+      if (!Array.isArray(e)) return null;
+      var p = e[0], w = e[1];
+      if (!Number.isInteger(p) || p < 1 || p > 100) return null;
+      if (!Number.isInteger(w) || w < 1 || w > 100) return null;
+      out.push({ percent: p, weight: w });
+    }
+    return out;
+  }
+  function fgRoulette() {
+    return (state && sanitizeRoulette(state.r)) || FG_ROULETTE_DEFAULT;
+  }
 
   // Sector geometry for the roulette wheel: cumulative degrees proportional to weight.
+  // The lowest-weight entry is the rare "jackpot" — unless every weight is equal, in which
+  // case nothing is rare.
   function rouletteSectors() {
-    var total = FG_ROULETTE.reduce(function (s, r) { return s + r.weight; }, 0);
-    var minWeight = Math.min.apply(null, FG_ROULETTE.map(function (r) { return r.weight; }));
+    var items = fgRoulette();
+    var total = items.reduce(function (s, r) { return s + r.weight; }, 0);
+    var minWeight = Math.min.apply(null, items.map(function (r) { return r.weight; }));
+    var maxWeight = Math.max.apply(null, items.map(function (r) { return r.weight; }));
     var acc = 0;
-    return FG_ROULETTE.map(function (r) {
+    return items.map(function (r) {
       var start = acc / total * 360;
       acc += r.weight;
       var end = acc / total * 360;
-      return { percent: r.percent, start: start, end: end, center: (start + end) / 2, rare: r.weight === minWeight };
+      return { percent: r.percent, start: start, end: end, center: (start + end) / 2, rare: minWeight < maxWeight && r.weight === minWeight };
     });
   }
 
-  // Weighted random draw — returns an index into FG_ROULETTE.
+  // Weighted random draw — returns an index into fgRoulette().
   function pickWeightedRouletteIndex() {
-    var total = FG_ROULETTE.reduce(function (s, r) { return s + r.weight; }, 0);
+    var items = fgRoulette();
+    var total = items.reduce(function (s, r) { return s + r.weight; }, 0);
     var r = Math.random() * total;
     var acc = 0;
-    for (var i = 0; i < FG_ROULETTE.length; i++) {
-      acc += FG_ROULETTE[i].weight;
+    for (var i = 0; i < items.length; i++) {
+      acc += items[i].weight;
       if (r < acc) return i;
     }
-    return FG_ROULETTE.length - 1;
+    return items.length - 1;
   }
 
   // ---------- state encode / decode ----------
@@ -464,6 +478,49 @@
     for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
     return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
+  // The share URL is untrusted input (anyone can hand you a crafted link) and its values
+  // end up inside HTML and inline onclick attributes, so every field is re-built here:
+  // ids and amounts must be plain integers, text must be strings, unknown fields are
+  // dropped. A link that doesn't fit throws, which init() reports as an unreadable link.
+  function isId(x) { return Number.isSafeInteger(x) && x > 0; }
+  function sanitizeState(obj) {
+    if (!obj || typeof obj !== 'object' || typeof obj.n !== 'string' || !Array.isArray(obj.m) || !Array.isArray(obj.p)) {
+      throw new Error('invalid state shape');
+    }
+    var memberIds = {};
+    var members = obj.m.map(function (m) {
+      if (!m || !isId(m.i) || typeof m.a !== 'string' || memberIds[m.i]) throw new Error('invalid member');
+      memberIds[m.i] = true;
+      return { i: m.i, a: m.a };
+    });
+    var payIds = {};
+    var payments = obj.p.map(function (p) {
+      if (!p || !isId(p.i) || payIds[p.i] || !isId(p.y) || !memberIds[p.y] || typeof p.l !== 'string' ||
+          !Number.isSafeInteger(p.a) || p.a <= 0 || !Array.isArray(p.s)) throw new Error('invalid payment');
+      payIds[p.i] = true;
+      var seen = {};
+      var s = p.s.filter(function (id) {
+        if (!isId(id) || !memberIds[id] || seen[id]) return false;
+        seen[id] = true;
+        return true;
+      });
+      if (!s.length) throw new Error('invalid payment participants');
+      return { i: p.i, y: p.y, l: p.l, a: p.a, s: s };
+    });
+    var out = {
+      v: 1, n: obj.n, m: members, p: payments,
+      // Only keys of the current form ("from-to-amount") survive; older "from-to" marks are dropped.
+      d: Array.isArray(obj.d) ? obj.d.filter(function (k) { return typeof k === 'string' && /^\d+-\d+-\d+$/.test(k); }) : []
+    };
+    var fg = obj.fg;
+    if (fg && typeof fg === 'object' && isId(fg.loser) && Number.isSafeInteger(fg.amount) && fg.amount >= 0) {
+      out.fg = { loser: fg.loser, amount: fg.amount };
+      if (Number.isInteger(fg.percent) && fg.percent >= 1 && fg.percent <= 100) out.fg.percent = fg.percent;
+    }
+    if (sanitizeRoulette(obj.r)) out.r = obj.r;
+    if (Number.isInteger(obj.g) && obj.g >= 1 && obj.g <= 99) out.g = obj.g;
+    return out;
+  }
   function decodeState(str) {
     var b64 = str.replace(/-/g, '+').replace(/_/g, '/');
     while (b64.length % 4) b64 += '=';
@@ -471,12 +528,7 @@
     var bytes = new Uint8Array(bin.length);
     for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
     var json = new TextDecoder().decode(bytes);
-    var obj = JSON.parse(json);
-    if (!obj || typeof obj.n !== 'string' || !Array.isArray(obj.m) || !Array.isArray(obj.p)) {
-      throw new Error('invalid state shape');
-    }
-    if (!Array.isArray(obj.d)) obj.d = [];
-    return obj;
+    return sanitizeState(JSON.parse(json));
   }
   function shareUrl() {
     return location.origin + location.pathname + location.search + '#s=' + encodeState(state);
@@ -504,6 +556,12 @@
   function totalSpent(st) {
     return st.p.reduce(function (s, p) { return s + p.a; }, 0);
   }
+  // The final gacha's penalty is always "percent of the current total", so it follows later
+  // changes to the payments instead of staying at the amount from the moment of the draw.
+  // (Older links without a percent fall back to the saved amount.)
+  function fgAmount(st) {
+    return st.fg.percent ? Math.round(totalSpent(st) * st.fg.percent / 100) : st.fg.amount;
+  }
   function computeSettlement(st) {
     var ids = st.m.map(function (m) { return m.i; });
     var paid = {}, owed = {};
@@ -525,8 +583,9 @@
     if (st.fg && ids.indexOf(st.fg.loser) !== -1) {
       var others = ids.filter(function (id) { return id !== st.fg.loser; });
       if (others.length) {
-        var relief = splitByWeight(st.fg.amount, others.map(function () { return 1; }));
-        net[st.fg.loser] -= st.fg.amount;
+        var penalty = fgAmount(st);
+        var relief = splitByWeight(penalty, others.map(function () { return 1; }));
+        net[st.fg.loser] -= penalty;
         others.forEach(function (id, idx) { net[id] += relief[idx]; });
       }
     }
@@ -541,7 +600,9 @@
     while (ci < creditors.length && di < debtors.length) {
       var c = creditors[ci], d = debtors[di];
       var amt = Math.min(c.amt, d.amt);
-      if (amt > 0) transfers.push({ from: d.id, to: c.id, amount: amt, key: d.id + '-' + c.id });
+      // The amount is part of the key: if the sum owed changes, an earlier "送金済み" mark
+      // must not carry over to what is now a different transfer.
+      if (amt > 0) transfers.push({ from: d.id, to: c.id, amount: amt, key: d.id + '-' + c.id + '-' + amt });
       c.amt -= amt; d.amt -= amt;
       if (c.amt === 0) ci++;
       if (d.amt === 0) di++;
@@ -564,7 +625,7 @@
   function avatarHtml(id, name, size) {
     size = size || 36;
     var fs = Math.round(size * 0.38);
-    return '<div class="avatar" style="width:' + size + 'px;height:' + size + 'px;font-size:' + fs + 'px;background:oklch(66% 0.15 ' + hueForId(id) + ')">' + esc(initial(name)) + '</div>';
+    return '<div class="avatar" style="width:' + size + 'px;height:' + size + 'px;font-size:' + fs + 'px">' + esc(initial(name)) + '</div>';
   }
   function isMemberPayer(st, id) {
     return st.p.some(function (p) { return p.y === id; });
@@ -576,15 +637,16 @@
   // ---------- app state ----------
   function freshUi() {
     return {
-      tab: 'pay', addOpen: false, shareOpen: false, homeError: '', memberError: '',
+      tab: 'pay', addOpen: false, editPaymentId: null, shareOpen: false, homeError: '', memberError: '',
       machine: null, roulette: null,
-      fgOpen: false, fgStage: 'setup', fgPercent: null, fgWinner: null, fgRoast: null
+      fgOpen: false, fgStage: 'setup', fgPercent: null, fgWinner: null, fgRoast: null, fgDraft: null
     };
   }
   var state = null;
   var ui = freshUi();
 
   function init() {
+    undoSnapshot = null;
     var h = location.hash || '';
     if (h.indexOf('#s=') === 0) {
       try {
@@ -597,7 +659,17 @@
     render();
   }
 
+  // Every state change goes through commit(). It also drops any pending "元に戻す" — an
+  // undo is only offered right after the deletion it belongs to, before anything else changes.
   function commit() {
+    undoSnapshot = null;
+    ui.memberError = '';
+    clearToast();
+    // "送金済み" marks only make sense for transfers that still exist as-is.
+    if (state.d.length) {
+      var live = computeSettlement(state).transfers.map(function (t) { return t.key; });
+      state.d = state.d.filter(function (k) { return live.indexOf(k) !== -1; });
+    }
     try { history.replaceState(null, '', shareUrl()); } catch (e) {}
     render();
   }
@@ -605,17 +677,50 @@
   function resetHome() {
     state = null;
     ui = freshUi();
+    undoSnapshot = null;
+    clearToast();
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     render();
   }
 
   // ---------- toast (own root, never touched by render()) ----------
   var toastTimer = null;
-  function showToast(msg) {
+  function clearToast() {
+    if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
     var root = document.getElementById('toast-root');
-    root.innerHTML = '<div class="toast"><span>' + esc(msg) + '</span></div>';
+    if (root) root.innerHTML = '';
+  }
+  // withUndo adds a "元に戻す" button (see deleteWithUndo) and keeps the toast up longer.
+  function showToast(msg, withUndo) {
+    var root = document.getElementById('toast-root');
+    root.innerHTML = '<div class="toast"><span>' + esc(msg) + '</span>' +
+      (withUndo ? '<button type="button" onclick="undoLast()">元に戻す</button>' : '') + '</div>';
     if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { root.innerHTML = ''; }, 3200);
+    toastTimer = setTimeout(function () { root.innerHTML = ''; undoSnapshot = null; }, withUndo ? 8000 : 3200);
+  }
+
+  // Deletions have no confirmation dialog; instead they can be taken back for a few seconds.
+  // The whole state is small (it lives in the URL), so undo just restores a copy of it.
+  var undoSnapshot = null;
+  // msg may be a function, so the text can depend on what mutate() found to change.
+  function deleteWithUndo(mutate, msg) {
+    var snapshot = JSON.stringify(state);
+    mutate();
+    commit();
+    undoSnapshot = snapshot;
+    showToast(typeof msg === 'function' ? msg() : msg, true);
+  }
+  window.undoLast = function () {
+    if (!undoSnapshot) return;
+    state = JSON.parse(undoSnapshot);
+    commit();
+    showToast('元に戻しました。');
+  };
+
+  // Same name (ignoring case and surrounding spaces) would make two people impossible to tell apart.
+  function hasDuplicateName(names) {
+    var lower = names.map(function (n) { return n.trim().toLowerCase(); });
+    return lower.some(function (n, i) { return lower.indexOf(n) !== i; });
   }
 
   // ---------- mutations ----------
@@ -627,6 +732,7 @@
     var names = Array.prototype.map.call(nameInputs, function (el) { return el.value.trim(); }).filter(Boolean);
     if (!name) { errEl.textContent = 'イベント名を入力してください。'; nameEl.focus(); return; }
     if (names.length < 2) { errEl.textContent = 'メンバーを2人以上入力してください。'; return; }
+    if (hasDuplicateName(names)) { errEl.textContent = '同じ名前のメンバーがいます。「田中A」「田中B」のように区別してください。'; return; }
     errEl.textContent = '';
     var members = names.map(function (n, i) { return { i: i + 1, a: n }; });
     state = { v: 1, n: name, m: members, p: [], d: [] };
@@ -638,7 +744,7 @@
     var wrap = document.getElementById('member-rows');
     var row = document.createElement('div');
     row.className = 'row';
-    row.innerHTML = '<input class="input member-name-input" placeholder="名前" style="flex:1">' +
+    row.innerHTML = '<input class="input member-name-input" maxlength="20" placeholder="名前" style="flex:1">' +
       '<button type="button" class="chip-remove" style="margin:0;width:30px;height:30px" onclick="this.parentElement.remove()" aria-label="削除">' + ICONS.close + '</button>';
     wrap.appendChild(row);
     row.querySelector('input').focus();
@@ -648,55 +754,89 @@
     var input = document.getElementById('new-member-name');
     var name = (input.value || '').trim();
     if (!name) { input.focus(); return; }
+    if (hasDuplicateName(state.m.map(function (m) { return m.a; }).concat(name))) {
+      ui.memberError = '同じ名前のメンバーがすでにいます。区別できる名前にしてください。';
+      render();
+      var again = document.getElementById('new-member-name');
+      again.value = name; again.focus();
+      return;
+    }
     state.m.push({ i: nextId(state.m), a: name });
     commit();
     showToast('仲間をテーブルにお迎えいたしました。新しい証文をお配りください。');
   };
 
   window.removeMember = function (id) {
+    if (state.m.length <= 2) {
+      ui.memberError = 'メンバーは最低2人必要なため、これ以上は削除できません。';
+      render();
+      return;
+    }
     if (isMemberPayer(state, id)) {
       ui.memberError = 'この人が支払いを記録しているため削除できません。先にその支払いを削除してください。';
       render();
       return;
     }
-    state.m = state.m.filter(function (m) { return m.i !== id; });
-    var touched = false;
-    state.p.forEach(function (p) {
-      if (p.s.indexOf(id) !== -1) {
-        p.s = p.s.filter(function (pid) { return pid !== id; });
-        if (!p.s.length) p.s = [p.y];
-        touched = true;
-      }
-    });
+    var touched = false, gachaCleared = false;
     ui.memberError = '';
-    commit();
-    showToast(touched ? 'そのお名前はテーブルよりお下がりいただきました。関わる勘定も整理いたしました。新しい証文をお配りください。' : 'そのお名前はテーブルよりお下がりいただきました。新しい証文をお配りください。');
+    deleteWithUndo(function () {
+      state.m = state.m.filter(function (m) { return m.i !== id; });
+      state.p.forEach(function (p) {
+        if (p.s.indexOf(id) !== -1) {
+          p.s = p.s.filter(function (pid) { return pid !== id; });
+          if (!p.s.length) p.s = [p.y];
+          touched = true;
+        }
+      });
+      // Ids are handed out as max+1, so a removed id can be reused by the next new member.
+      // Drop the gacha result that pointed at this person, or it would land on the newcomer.
+      if (state.fg && state.fg.loser === id) { delete state.fg; delete state.g; gachaCleared = true; }
+    }, function () {
+      return 'そのお名前はテーブルよりお下がりいただきました。' + (touched ? '関わる勘定も整理いたしました。' : '') +
+        (gachaCleared ? '最終ガチャの裁定も取り消しました。' : '') + '新しい証文をお配りください。';
+    });
   };
 
   window.openAddPayment = function () {
+    ui.editPaymentId = null;
+    ui.addOpen = true;
+    render();
+  };
+  // The same sheet doubles as the edit form when ui.editPaymentId is set.
+  window.openEditPayment = function (id) {
+    ui.editPaymentId = id;
     ui.addOpen = true;
     render();
   };
   window.closeAddPayment = function () {
     ui.addOpen = false;
+    ui.editPaymentId = null;
     render();
   };
 
   window.submitPayment = function () {
     var payer = parseInt(document.getElementById('pay-payer').value, 10);
     var label = (document.getElementById('pay-label').value || '').trim();
-    var amount = parseInt(document.getElementById('pay-amount').value, 10);
+    var amountText = (document.getElementById('pay-amount').value || '').trim();
+    var amount = /^\d+$/.test(amountText) ? parseInt(amountText, 10) : NaN;
     var checks = document.querySelectorAll('.pay-participant:checked');
     var participants = Array.prototype.map.call(checks, function (c) { return parseInt(c.value, 10); });
     var errEl = document.getElementById('pay-err');
     if (!label) { errEl.textContent = '内容を入力してください。'; return; }
-    if (!amount || amount <= 0) { errEl.textContent = '金額を正しく入力してください。'; return; }
+    if (!amount || amount <= 0) { errEl.textContent = '金額は1円以上の整数で入力してください。'; return; }
+    if (amount > MAX_AMOUNT) { errEl.textContent = '金額が大きすぎます（1兆円未満で入力してください）。'; return; }
     if (!participants.length) { errEl.textContent = '対象者を1人以上選んでください。'; return; }
     errEl.textContent = '';
-    state.p.push({ i: nextId(state.p), y: payer, l: label, a: amount, s: participants });
+    var editing = ui.editPaymentId !== null && state.p.find(function (p) { return p.i === ui.editPaymentId; });
+    if (editing) {
+      editing.y = payer; editing.l = label; editing.a = amount; editing.s = participants;
+    } else {
+      state.p.push({ i: nextId(state.p), y: payer, l: label, a: amount, s: participants });
+    }
     ui.addOpen = false;
+    ui.editPaymentId = null;
     commit();
-    showToast('一筆、帳簿に記録いたしました。新しい証文をお配りください。');
+    showToast(editing ? 'その一筆を書き改めました。新しい証文をお配りください。' : '一筆、帳簿に記録いたしました。新しい証文をお配りください。');
   };
 
   // ---------- gachapon machine (final gacha's second roulette: who pays) ----------
@@ -744,7 +884,10 @@
   function renderRouletteWheel(angleDeg, spinning) {
     var sectors = rouletteSectors();
     var stops = sectors.map(function (s, idx) {
-      var color = s.rare ? 'oklch(64% 0.22 25)' : 'oklch(58% 0.15 ' + HUES[idx % HUES.length] + ')';
+      // Neighbouring sectors always differ, including the last one wrapping around to the first.
+      var shade = idx % TINTS.length;
+      if (idx === sectors.length - 1 && shade === 0) shade = 1;
+      var color = s.rare ? 'var(--danger)' : accentTint(shade);
       return color + ' ' + s.start + 'deg ' + s.end + 'deg';
     }).join(', ');
     var labels = sectors.map(function (s) {
@@ -787,7 +930,7 @@
 
     var sectors = rouletteSectors();
     var idx = pickWeightedRouletteIndex();
-    var winner = FG_ROULETTE[idx].percent;
+    var winner = fgRoulette()[idx].percent;
     var center = sectors[idx].center;
     var targetMod = (360 - center) % 360;
     var delta = ((targetMod - angle) % 360 + 360) % 360;
@@ -820,8 +963,78 @@
   window.closeFinalGacha = function () {
     if (gachaTimer) { clearTimeout(gachaTimer); gachaTimer = null; }
     if (rouletteTimer) { clearTimeout(rouletteTimer); rouletteTimer = null; }
-    ui.fgOpen = false; ui.fgStage = 'setup'; ui.fgPercent = null; ui.fgWinner = null; ui.machine = null; ui.roulette = null;
+    ui.fgOpen = false; ui.fgStage = 'setup'; ui.fgPercent = null; ui.fgWinner = null; ui.machine = null; ui.roulette = null; ui.fgDraft = null;
     render();
+  };
+
+  // ---------- roulette settings (edit the wheel's percentages and how likely each is) ----------
+  // The form is edited as a draft of strings (ui.fgDraft). Rows are added/removed by
+  // re-rendering, so the typed values are copied out of the DOM into the draft first.
+  function readRouletteDraft() {
+    var rows = document.querySelectorAll('.rs-row');
+    if (!rows.length) return;
+    ui.fgDraft = Array.prototype.map.call(rows, function (row) {
+      return { p: row.querySelector('.rs-percent').value, w: row.querySelector('.rs-weight').value };
+    });
+  }
+  function setRouletteError(msg) {
+    var el = document.getElementById('rs-err');
+    if (el) el.textContent = msg;
+  }
+  // "Chance" shown next to each row: its weight as a share of all valid weights.
+  function rouletteChanceTexts(weightStrs) {
+    var valid = weightStrs.map(function (s) { return /^\d+$/.test(s) && parseInt(s, 10) >= 1 ? parseInt(s, 10) : 0; });
+    var total = valid.reduce(function (a, b) { return a + b; }, 0);
+    return valid.map(function (w) { return w && total ? (Math.round(w / total * 1000) / 10) + '%' : '—'; });
+  }
+  window.updateRouletteChances = function () {
+    var rows = document.querySelectorAll('.rs-row');
+    var texts = rouletteChanceTexts(Array.prototype.map.call(rows, function (row) { return row.querySelector('.rs-weight').value; }));
+    Array.prototype.forEach.call(rows, function (row, i) { row.querySelector('.rs-chance').textContent = texts[i]; });
+  };
+
+  window.openRouletteSettings = function () {
+    ui.fgDraft = fgRoulette().map(function (r) { return { p: String(r.percent), w: String(r.weight) }; });
+    ui.fgStage = 'settings';
+    render();
+  };
+  window.cancelRouletteSettings = function () {
+    ui.fgDraft = null; ui.fgStage = 'setup';
+    render();
+  };
+  window.addRouletteRow = function () {
+    readRouletteDraft();
+    if (ui.fgDraft.length >= FG_MAX_ITEMS) { setRouletteError('項目は最大' + FG_MAX_ITEMS + '個までです。'); return; }
+    ui.fgDraft.push({ p: '', w: '10' });
+    render();
+  };
+  window.removeRouletteRow = function (i) {
+    readRouletteDraft();
+    if (ui.fgDraft.length <= FG_MIN_ITEMS) { setRouletteError('項目は最低' + FG_MIN_ITEMS + '個必要です。'); return; }
+    ui.fgDraft.splice(i, 1);
+    render();
+  };
+  window.resetRouletteDraft = function () {
+    ui.fgDraft = FG_ROULETTE_DEFAULT.map(function (r) { return { p: String(r.percent), w: String(r.weight) }; });
+    render();
+  };
+  window.saveRouletteSettings = function () {
+    readRouletteDraft();
+    var items = [];
+    for (var i = 0; i < ui.fgDraft.length; i++) {
+      var d = ui.fgDraft[i];
+      var rowNo = (i + 1) + '行目：';
+      if (!/^\d+$/.test(d.p) || parseInt(d.p, 10) < 1 || parseInt(d.p, 10) > 100) { setRouletteError(rowNo + '罰金の割合は1〜100の整数で入力してください。'); return; }
+      if (!/^\d+$/.test(d.w) || parseInt(d.w, 10) < 1 || parseInt(d.w, 10) > 100) { setRouletteError(rowNo + '出やすさは1〜100の整数で入力してください。'); return; }
+      items.push([parseInt(d.p, 10), parseInt(d.w, 10)]);
+    }
+    if (items.length < FG_MIN_ITEMS || items.length > FG_MAX_ITEMS) { setRouletteError('項目は' + FG_MIN_ITEMS + '〜' + FG_MAX_ITEMS + '個で設定してください。'); return; }
+    var isDefault = items.length === FG_ROULETTE_DEFAULT.length && items.every(function (it, k) {
+      return it[0] === FG_ROULETTE_DEFAULT[k].percent && it[1] === FG_ROULETTE_DEFAULT[k].weight;
+    });
+    if (isDefault) delete state.r; else state.r = items;
+    ui.fgDraft = null; ui.fgStage = 'setup';
+    commit();
   };
 
   window.startFinalGachaMachine = function () {
@@ -841,6 +1054,7 @@
     if (!ui.fgWinner || !ui.fgPercent) return;
     var amount = Math.round(totalSpent(state) * ui.fgPercent / 100);
     state.fg = { loser: ui.fgWinner, amount: amount, percent: ui.fgPercent };
+    state.g = (state.g || 0) + 1;
     ui.fgOpen = false; ui.fgStage = 'setup'; ui.fgPercent = null; ui.fgWinner = null; ui.machine = null;
     commit();
     showToast('運命の裁定を帳簿に記録いたしました。新しい証文をお配りください。');
@@ -852,22 +1066,14 @@
     render();
   };
 
-  window.redrawFinalGachaInSheet = function () {
-    ui.fgStage = 'percentRoulette'; ui.fgPercent = null; ui.fgWinner = null;
-    ui.roulette = freshRoulette();
-    render();
-  };
-
   window.removeFinalGacha = function () {
-    delete state.fg;
-    commit();
-    showToast('運命の裁定を取り消させていただきました。');
+    deleteWithUndo(function () { delete state.fg; }, '運命の裁定を取り消させていただきました。');
   };
 
   window.removePayment = function (id) {
-    state.p = state.p.filter(function (p) { return p.i !== id; });
-    commit();
-    showToast('その一筆は帳簿より消去いたしました。');
+    deleteWithUndo(function () {
+      state.p = state.p.filter(function (p) { return p.i !== id; });
+    }, 'その一筆は帳簿より消去いたしました。');
   };
 
   window.switchTab = function (tab) { ui.tab = tab; render(); };
@@ -906,8 +1112,13 @@
     }
   };
 
-  window.resetHome = resetHome;
+  // Reset throws away the whole event — and since the event only lives in the URL, there
+  // is no getting it back — so it asks first.
+  window.confirmReset = function () {
+    if (window.confirm('このイベントの記録をすべて消して、最初の画面に戻ります。\n共有リンクを控えていない場合、元に戻すことはできません。よろしいですか？')) resetHome();
+  };
   window.dismissHint = function () {
+    ui._hintDismissed = true;
     var el = document.getElementById('event-hint');
     if (el) el.remove();
   };
@@ -924,16 +1135,16 @@
         '<div class="appbar"><div class="brand"><span class="brand-mark"><span></span><span></span></span><span class="brand-name">闇ワリカ</span></div></div>' +
         '<div class="container">' +
           '<div style="display:flex;flex-direction:column;gap:6px;padding:6px 2px 0">' +
-            '<h1 style="font-size:22px;color:oklch(93% 0.1 86);-webkit-text-stroke:0.3px oklch(93% 0.1 86);text-shadow:0 0 16px oklch(80% 0.14 84 / 0.45), 0 1px 2px oklch(0% 0 0 / 0.6)">さあ、清算の刻でございます。</h1>' +
+            '<h1 style="font-size:1.35rem">さあ、清算の刻でございます。</h1>' +
             '<p class="lede">面倒なご登録は不要でございます。証文（リンク）を一枚お回しいただくだけで、皆様はすぐにテーブルにお揃いになります。</p>' +
           '</div>' +
           err +
           '<div class="card" style="display:flex;flex-direction:column;gap:16px">' +
-            '<div class="field"><label for="ev-name">イベント名</label><input id="ev-name" class="input" placeholder="例：沖縄旅行"></div>' +
+            '<div class="field"><label for="ev-name">イベント名</label><input id="ev-name" class="input" maxlength="40" placeholder="例：沖縄旅行"></div>' +
             '<div class="field"><label>メンバー</label>' +
               '<div id="member-rows" class="rows">' +
-                '<div class="row"><input class="input member-name-input" placeholder="名前"></div>' +
-                '<div class="row"><input class="input member-name-input" placeholder="名前"></div>' +
+                '<div class="row"><input class="input member-name-input" maxlength="20" placeholder="名前"></div>' +
+                '<div class="row"><input class="input member-name-input" maxlength="20" placeholder="名前"></div>' +
               '</div>' +
               '<button type="button" class="btn-text" onclick="addMemberRow()">' + ICONS.plus + 'メンバーを追加</button>' +
             '</div>' +
@@ -950,26 +1161,26 @@
     return '' +
       '<div class="wrap">' +
         '<div class="appbar">' +
-          '<button class="reset-btn" onclick="resetHome()" aria-label="リセット">' + ICONS.reset + '<span>リセット</span></button>' +
+          '<button class="reset-btn" onclick="confirmReset()" aria-label="リセット">' + ICONS.reset + '<span>リセット</span></button>' +
           '<div class="appbar-title">' + esc(state.n) + '</div>' +
           '<button class="iconbtn" onclick="openShare()" aria-label="共有">' + ICONS.share + '</button>' +
         '</div>' +
         '<div class="container">' +
-          '<div class="card" style="background:linear-gradient(135deg, oklch(30% 0.09 22), oklch(15% 0.03 30));border:1px solid oklch(55% 0.09 82 / 0.5);box-shadow:0 8px 22px oklch(0% 0 0 / 0.5), inset 0 1px 0 oklch(100% 0 0 / 0.06)">' +
+          '<div class="card" style="background:var(--accent);border-color:var(--accent);color:var(--accent-ink)">' +
             '<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px">' +
               '<div style="display:flex;flex-direction:column;gap:2px">' +
-                '<span style="color:oklch(85% 0.03 70 / 0.85);font-size:12px">合計金額</span>' +
-                '<span class="num" style="color:var(--gold);font-weight:900;font-size:25px;text-shadow:0 0 14px oklch(80% 0.12 84 / 0.5)">' + yen(total) + '</span>' +
+                '<span style="opacity:0.8;font-size:0.75rem">合計金額</span>' +
+                '<span class="num" style="font-size:1.5rem">' + yen(total) + '</span>' +
               '</div>' +
-              '<span style="color:oklch(85% 0.03 70 / 0.85);font-size:12.5px">' + state.m.length + '人・' + state.p.length + '件</span>' +
+              '<span style="opacity:0.8;font-size:0.78rem">' + state.m.length + '人・' + state.p.length + '件</span>' +
             '</div>' +
           '</div>' +
           renderHint() +
           '<div style="display:flex;flex-direction:column;gap:10px">' +
-            '<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:14px">メンバー（' + state.m.length + '人）</h3></div>' +
+            '<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:0.85rem">メンバー（' + state.m.length + '人）</h3></div>' +
             '<div class="chips">' + state.m.map(renderMemberChip).join('') + '</div>' +
             '<div class="addmember-row">' +
-              '<input id="new-member-name" class="input" placeholder="名前を入力して追加">' +
+              '<input id="new-member-name" class="input" maxlength="20" placeholder="名前を入力して追加">' +
               '<button type="button" class="btn btn-primary btn-sm" onclick="addMember()">' + ICONS.plus + '追加</button>' +
             '</div>' +
             (ui.memberError ? '<div class="err-text">' + esc(ui.memberError) + '</div>' : '') +
@@ -1014,6 +1225,7 @@
         avatarHtml(p.y, payer, 38) +
         '<div class="meta"><span class="label">' + esc(p.l) + '</span><span class="sub">' + sub + '</span></div>' +
         '<span class="num amt">' + yen(p.a) + '</span>' +
+        '<button class="icon-edit" onclick="openEditPayment(' + p.i + ')" aria-label="編集">' + ICONS.edit + '</button>' +
         '<button class="icon-danger" onclick="removePayment(' + p.i + ')" aria-label="削除">' + ICONS.trash + '</button>' +
       '</div>';
     }).join('');
@@ -1042,7 +1254,7 @@
         return '<div class="card-flat transfer-card">' +
           '<div class="transfer-top">' +
             avatarHtml(t.from, memberName(state, t.from), 30) + '<span class="transfer-name">' + esc(memberName(state, t.from)) + '</span>' +
-            '<span style="color:var(--text-tertiary);display:flex">' + ICONS.arrow + '</span>' +
+            '<span style="color:var(--muted);display:flex">' + ICONS.arrow + '</span>' +
             avatarHtml(t.to, memberName(state, t.to), 30) + '<span class="transfer-name">' + esc(memberName(state, t.to)) + '</span>' +
             '<span class="num transfer-amt">' + yen(t.amount) + '</span>' +
           '</div>' +
@@ -1050,7 +1262,7 @@
         '</div>';
       }).join('');
       body = '<div style="display:flex;justify-content:space-between;align-items:center">' +
-          '<h3 style="font-size:14px">送金リスト</h3><span class="badge badge-success">最少' + count + '件で精算</span>' +
+          '<h3 style="font-size:0.85rem">送金リスト</h3><span class="badge badge-success">' + count + '件で精算</span>' +
         '</div><div class="rows" style="margin-top:10px">' + list + '</div>';
     }
 
@@ -1061,6 +1273,8 @@
     '</div>';
   }
 
+  function drawsLeft() { return Math.max(0, FG_MAX_DRAWS - (state.g || 0)); }
+
   function renderFinalGachaCard() {
     if (state.m.length < 2) return '';
     if (state.fg && state.m.some(function (m) { return m.i === state.fg.loser; })) {
@@ -1068,43 +1282,88 @@
       return '<div class="fg-card">' +
         '<div class="fg-head">' + ICONS.dice + '<h3>最終ガチャ結果</h3></div>' +
         '<div class="fg-result-row">' + avatarHtml(state.fg.loser, memberName(state, state.fg.loser), 34) +
-          '<span class="name">' + esc(memberName(state, state.fg.loser)) + '様が' + yen(state.fg.amount) + pctNote + 'を奢ることと相成りました。</span>' +
+          '<span class="name">' + esc(memberName(state, state.fg.loser)) + '様が' + yen(fgAmount(state)) + pctNote + 'を奢ることと相成りました。</span>' +
         '</div>' +
+        (drawsLeft() > 0 ? '' : '<p class="lede" style="font-size:.72rem;text-align:center;margin:0">引き直しは使い切りました。</p>') +
         '<div class="fg-links">' +
-          '<button type="button" class="btn-text" onclick="redoFinalGachaFromCard()">' + ICONS.dice + '引き直す</button>' +
+          (drawsLeft() > 0 ? '<button type="button" class="btn-text" onclick="redoFinalGachaFromCard()">' + ICONS.dice + '引き直す（あと' + drawsLeft() + '回）</button>' : '') +
           '<button type="button" class="btn-text" onclick="removeFinalGacha()">取り消す</button>' +
         '</div>' +
       '</div>';
     }
+    if (drawsLeft() === 0) {
+      return '<div class="fg-card"><div class="fg-head">' + ICONS.dice + '<h3>最終ガチャ</h3></div>' +
+        '<p class="lede" style="font-size:.75rem;margin:0">このイベントの最終ガチャは、すでに使い切りました。</p></div>';
+    }
     return '<div class="fg-card">' +
       '<div class="fg-head">' + ICONS.dice + '<h3>最後に、運命をお試しになりますか？</h3></div>' +
-      '<p class="lede" style="font-size:12px">運命の輪が二度回ります。まずは罰金の割合、続いて奢っていただく方——最終的な金額は、そこで確定いたします。</p>' +
+      '<p class="lede" style="font-size:0.78rem">運命の輪が二度回ります。まずは罰金の割合、続いて奢っていただく方——最終的な金額は、そこで確定いたします。</p>' +
       '<button type="button" class="btn btn-secondary btn-block" onclick="openFinalGacha()">最終ガチャを引く</button>' +
     '</div>';
+  }
+
+  // The close button is offered only while nothing has been decided (setup, settings, and the
+  // spinning wheel before "ストップ"). Once a percentage or a winner is on screen the draw has to
+  // be carried through — closing and reopening would be a free redraw.
+  function fgCloseButton() {
+    var open = ui.fgStage === 'setup' || ui.fgStage === 'settings' ||
+      (ui.fgStage === 'percentRoulette' && ui.roulette && ui.roulette.phase === 'spinning');
+    return open ? '<button class="iconbtn" onclick="closeFinalGacha()" aria-label="閉じる">' + ICONS.close + '</button>' : '';
   }
 
   function renderFinalGachaSheet() {
     var inner = ui.fgStage === 'percentRoulette' ? renderPercentRouletteStage()
       : ui.fgStage === 'percentResult' ? renderFgPercentResult()
-      : ui.fgStage === 'loserMachine' ? renderGachaMachineStage('最終ガチャ', 'closeFinalGacha()')
+      : ui.fgStage === 'loserMachine' ? renderGachaMachineStage('最終ガチャ')
       : ui.fgStage === 'result' ? renderFinalGachaResult()
+      : ui.fgStage === 'settings' ? renderRouletteSettings()
       : renderFinalGachaSetup();
     var allowBackdrop = ui.fgStage === 'setup';
     return '<div class="overlay" onclick="if(event.target===this && ' + allowBackdrop + ')closeFinalGacha()">' +
-      '<div class="sheet">' + inner + '</div>' +
+      '<div class="sheet" role="dialog" aria-modal="true" aria-label="最終ガチャ">' + inner + '</div>' +
     '</div>';
   }
 
   function renderFinalGachaSetup() {
+    var percents = fgRoulette().map(function (r) { return r.percent; });
     return '' +
-      '<div class="sheet-head"><h2>最終ガチャ</h2><button class="iconbtn" onclick="closeFinalGacha()" aria-label="閉じる">' + ICONS.close + '</button></div>' +
-      '<p class="lede" style="font-size:12.5px">まずはルーレットが、罰金の割合（' + FG_PERCENTS.join('%・') + '%のいずれか）を合計金額の中からお選びいたします。続いて、全' + state.m.length + '名様の中からガチャでお一人が選ばれ、その方が算出された金額を皆様に奢ることになります。</p>' +
-      '<button type="button" class="btn btn-primary btn-block" onclick="startFinalGachaMachine()">' + ICONS.dice + 'ルーレットを回す</button>';
+      '<div class="sheet-head"><h2>最終ガチャ</h2>' + fgCloseButton() + '</div>' +
+      '<p class="lede" style="font-size:0.78rem">まずはルーレットが、罰金の割合（' + percents.join('%・') + '%のいずれか）を合計金額の中からお選びいたします。続いて、全' + state.m.length + '名様の中からガチャでお一人が選ばれ、その方が算出された金額を皆様に奢ることになります。</p>' +
+      '<p class="lede" style="font-size:.72rem">※ルーレットを止めたあとは、結果が出るまで途中で閉じられません。引き直しは、結果を反映したあとに1回だけ可能です。</p>' +
+      '<button type="button" class="btn btn-primary btn-block" onclick="startFinalGachaMachine()">' + ICONS.dice + 'ルーレットを回す</button>' +
+      '<div class="row" style="justify-content:center"><button type="button" class="btn-text" onclick="openRouletteSettings()">ルーレットの％を設定する</button></div>';
+  }
+
+  function renderRouletteSettings() {
+    var draft = ui.fgDraft || [];
+    var chances = rouletteChanceTexts(draft.map(function (d) { return d.w; }));
+    var rows = draft.map(function (d, i) {
+      return '<div class="rs-grid rs-row">' +
+        '<input class="input rs-percent" type="number" inputmode="numeric" min="1" max="100" step="1" value="' + esc(d.p) + '" aria-label="罰金の割合（%）">' +
+        '<input class="input rs-weight" type="number" inputmode="numeric" min="1" max="100" step="1" value="' + esc(d.w) + '" aria-label="出やすさ" oninput="updateRouletteChances()">' +
+        '<span class="num rs-chance">' + chances[i] + '</span>' +
+        '<button type="button" class="chip-remove" style="margin:0;width:30px;height:30px" onclick="removeRouletteRow(' + i + ')" aria-label="この項目を削除">' + ICONS.close + '</button>' +
+      '</div>';
+    }).join('');
+    return '' +
+      '<div class="sheet-head"><h2>ルーレットの設定</h2>' + fgCloseButton() + '</div>' +
+      '<p class="lede" style="font-size:0.78rem">ルーレットに載せる罰金の割合（%）と、その出やすさを決められます。出やすさは数字が大きいほど出やすくなります（1〜100）。このイベントを共有した皆様にも、同じ設定が引き継がれます。</p>' +
+      '<div class="rows">' +
+        '<div class="rs-grid rs-head"><span>罰金の割合（%）</span><span>出やすさ</span><span>出る確率</span><span></span></div>' +
+        rows +
+      '</div>' +
+      '<div class="err-text" id="rs-err"></div>' +
+      '<div class="row" style="justify-content:space-between">' +
+        '<button type="button" class="btn-text" onclick="addRouletteRow()">' + ICONS.plus + '項目を追加</button>' +
+        '<button type="button" class="btn-text" onclick="resetRouletteDraft()">初期値に戻す</button>' +
+      '</div>' +
+      '<button type="button" class="btn btn-primary btn-block" onclick="saveRouletteSettings()">この設定で保存する</button>' +
+      '<div class="row" style="justify-content:center"><button type="button" class="btn-text" onclick="cancelRouletteSettings()">戻る</button></div>';
   }
 
   function renderPercentRouletteStage() {
     return '' +
-      '<div class="sheet-head"><h2>最終ガチャ</h2><button class="iconbtn" onclick="closeFinalGacha()" aria-label="閉じる">' + ICONS.close + '</button></div>' +
+      '<div class="sheet-head"><h2>最終ガチャ</h2>' + fgCloseButton() + '</div>' +
       '<div class="gacha-summary"><span class="label">罰金の割合を決定</span><span class="num amt">合計 ' + yen(totalSpent(state)) + '</span></div>' +
       renderRouletteWheel(0, true) +
       '<div class="gacha-stage-text">ルーレットが回っております…</div>' +
@@ -1115,7 +1374,7 @@
     var total = totalSpent(state);
     var amount = Math.round(total * ui.fgPercent / 100);
     return '' +
-      '<div class="sheet-head"><h2>最終ガチャ</h2><button class="iconbtn" onclick="closeFinalGacha()" aria-label="閉じる">' + ICONS.close + '</button></div>' +
+      '<div class="sheet-head"><h2>最終ガチャ</h2>' + fgCloseButton() + '</div>' +
       renderRouletteWheel(ui.roulette ? ui.roulette.finalAngle : 0, false) +
       '<div class="gacha-percent-banner"><span class="headline">罰金の割合は【' + ui.fgPercent + '%】に決定いたしました。</span><span class="sub">合計' + yen(total) + 'の' + ui.fgPercent + '%　＝　' + yen(amount) + '</span></div>' +
       '<button type="button" class="btn btn-primary btn-block" onclick="proceedToLoserRoulette()">次へ：奢っていただく方を決める</button>';
@@ -1133,14 +1392,12 @@
         return '<div class="row2"><span class="nm">' + esc(memberName(state, id)) + '</span><span class="num sh">+' + yen(relief[idx]) + '</span></div>';
       }).join('');
     return '' +
-      '<div class="sheet-head"><h2>最終ガチャ結果</h2><button class="iconbtn" onclick="closeFinalGacha()" aria-label="閉じる">' + ICONS.close + '</button></div>' +
-      '<div class="gm-wrap"><div class="gm-slot" style="width:88px;height:88px;border-radius:50%;margin:0 auto;background:none;box-shadow:none">' + avatarHtml(winner, memberName(state, winner), 76) + '</div></div>' +
+      '<div class="sheet-head"><h2>最終ガチャ結果</h2>' + fgCloseButton() + '</div>' +
+      '<div class="gm-wrap"><div class="gm-slot" style="width:88px;height:88px;border-radius:50%;margin:0 auto;background:none;border:none">' + avatarHtml(winner, memberName(state, winner), 76) + '</div></div>' +
       '<div class="gacha-result-banner"><span class="headline">誠に残念ながら、' + esc(memberName(state, winner)) + '様が、合計の' + ui.fgPercent + '%（' + yen(amount) + '）を奢ることと相成りました。</span><span class="roast">' + esc(ui.fgRoast || '') + '</span></div>' +
       '<div class="gacha-breakdown">' + breakdown + '</div>' +
       '<button type="button" class="btn btn-primary btn-block" onclick="confirmFinalGacha()">この結果を反映する</button>' +
-      '<div class="row" style="justify-content:center;gap:18px">' +
-        '<button type="button" class="btn-text" onclick="redrawFinalGachaInSheet()">' + ICONS.dice + '引き直す</button>' +
-      '</div>';
+      '<p class="lede" style="font-size:.75rem;text-align:center">結果は覚悟してお受けくださいませ。引き直しは、反映したあとに1回だけ可能です。</p>';
   }
 
   function renderAddPaymentBottom() {
@@ -1149,27 +1406,29 @@
 
   function renderAddPaymentSheet() {
     return '<div class="overlay" onclick="if(event.target===this)closeAddPayment()">' +
-      '<div class="sheet">' + renderPaymentForm() + '</div>' +
+      '<div class="sheet" role="dialog" aria-modal="true" aria-label="支払い">' + renderPaymentForm() + '</div>' +
     '</div>';
   }
 
   function renderPaymentForm() {
+    var ep = ui.editPaymentId !== null ? state.p.find(function (p) { return p.i === ui.editPaymentId; }) : null;
     var payerOptions = state.m.map(function (m) {
-      return '<option value="' + m.i + '">' + esc(m.a) + '</option>';
+      return '<option value="' + m.i + '"' + (ep && ep.y === m.i ? ' selected' : '') + '>' + esc(m.a) + '</option>';
     }).join('');
     var checks = state.m.map(function (m) {
-      return '<label class="row" style="gap:8px;font-size:13.5px">' +
-        '<input type="checkbox" class="pay-participant" value="' + m.i + '" checked style="width:17px;height:17px">' +
+      var on = ep ? ep.s.indexOf(m.i) !== -1 : true;
+      return '<label class="row" style="gap:8px;font-size:0.85rem">' +
+        '<input type="checkbox" class="pay-participant" value="' + m.i + '"' + (on ? ' checked' : '') + ' style="width:19px;height:19px">' +
         avatarHtml(m.i, m.a, 26) + '<span>' + esc(m.a) + '</span></label>';
     }).join('');
     return '' +
-      '<div class="sheet-head"><h2>支払いを追加</h2><button class="iconbtn" onclick="closeAddPayment()" aria-label="閉じる">' + ICONS.close + '</button></div>' +
+      '<div class="sheet-head"><h2>' + (ep ? '支払いを編集' : '支払いを追加') + '</h2><button class="iconbtn" onclick="closeAddPayment()" aria-label="閉じる">' + ICONS.close + '</button></div>' +
       '<div class="field"><label for="pay-payer">支払った人</label><select id="pay-payer" class="input">' + payerOptions + '</select></div>' +
-      '<div class="field"><label for="pay-label">内容</label><input id="pay-label" class="input" placeholder="例：ホテル代"></div>' +
-      '<div class="field"><label for="pay-amount">金額</label><input id="pay-amount" class="input" type="number" inputmode="numeric" min="1" placeholder="0"></div>' +
+      '<div class="field"><label for="pay-label">内容</label><input id="pay-label" class="input" maxlength="30" placeholder="例：ホテル代" value="' + (ep ? esc(ep.l) : '') + '"></div>' +
+      '<div class="field"><label for="pay-amount">金額</label><input id="pay-amount" class="input" type="number" inputmode="numeric" min="1" placeholder="0" value="' + (ep ? ep.a : '') + '"></div>' +
       '<div class="field"><label>対象者</label><div class="rows">' + checks + '</div></div>' +
       '<div id="pay-err" class="err-text"></div>' +
-      '<button type="button" class="btn btn-primary btn-block" onclick="submitPayment()">追加する</button>';
+      '<button type="button" class="btn btn-primary btn-block" onclick="submitPayment()">' + (ep ? '保存する' : '追加する') + '</button>';
   }
 
   // The gachapon machine visual itself: dome full of capsules, a crank, and a drop
@@ -1181,20 +1440,18 @@
     var capSize = n <= 4 ? 44 : (n <= 6 ? 38 : 32);
     var domeEmpty = m.phase === 'dropping' || m.phase === 'cracking';
     var domeCapsules = m.participants.map(function (val, idx) {
-      var hue = hueForId(val);
       var label = esc(initial(memberName(state, val)));
       return '<div class="gm-capsule' + (domeEmpty ? ' gm-capsule-gone' : '') +
         '" style="width:' + capSize + 'px;height:' + capSize + 'px;font-size:' + Math.round(capSize * 0.4) +
-        'px;background:radial-gradient(circle at 35% 30%, oklch(72% 0.11 ' + hue + '), oklch(52% 0.16 ' + hue + ') 65%, oklch(42% 0.15 ' + hue + ') 100%);animation-delay:' + (idx * 0.13) + 's">' +
+        'px;background:' + accentTint(val - 1) + ';animation-delay:' + (idx * 0.13) + 's">' +
         label + '</div>';
     }).join('');
     var dropEl = '';
     if (m.phase === 'dropping' || m.phase === 'cracking') {
-      var whue = hueForId(m.winner);
       var reveal = avatarHtml(m.winner, memberName(state, m.winner), 44);
       dropEl = '<div class="gm-capsule-drop' + (m.phase === 'cracking' ? ' cracking' : '') + '">' +
-        '<div class="gm-shell-top" style="background:oklch(94% 0.03 ' + whue + ')"></div>' +
-        '<div class="gm-shell-bottom" style="background:oklch(66% 0.15 ' + whue + ')"></div>' +
+        '<div class="gm-shell-top" style="background:var(--surface)"></div>' +
+        '<div class="gm-shell-bottom" style="background:' + accentTint(m.winner - 1) + '"></div>' +
         '<div class="gm-avatar-reveal">' + reveal + '</div>' +
       '</div>';
     }
@@ -1216,12 +1473,11 @@
       '</div>';
   }
 
-  function renderGachaMachineStage(title, closeOnclick) {
-    var allowClose = ui.machine.phase === 'idle';
+  function renderGachaMachineStage(title) {
     var summary = '<div class="gacha-summary"><span class="label">奢っていただく方を決定（対象' + ui.machine.participants.length + '人）</span><span class="num amt">罰金 ' + yen(Math.round(totalSpent(state) * ui.fgPercent / 100)) + '</span></div>';
     return '' +
       '<div class="sheet-head"><h2>' + esc(title) + '</h2>' +
-      (allowClose ? '<button class="iconbtn" onclick="' + closeOnclick + '" aria-label="閉じる">' + ICONS.close + '</button>' : '') +
+      fgCloseButton() +
       '</div>' +
       summary +
       renderGachaMachine();
@@ -1229,25 +1485,60 @@
 
   function renderShareSheet() {
     var url = shareUrl();
+    // Long events (roughly 30+ payments) overflow a QR code. Try the usual error-correction
+    // level first, then the lower one, which holds more; if neither fits, say so.
     var qr = '';
-    try {
-      var qc = qrcode(0, 'M');
-      qc.addData(url);
-      qc.make();
-      qr = qc.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
-    } catch (e) {
-      qr = '<span style="font-size:12px;color:#900">QRコードを生成できませんでした</span>';
-    }
+    var qc = null;
+    ['M', 'L'].some(function (level) {
+      try {
+        var t = qrcode(0, level);
+        t.addData(url);
+        t.make();
+        qc = t;
+        return true;
+      } catch (e) { return false; }
+    });
+    qr = qc
+      ? qc.createSvgTag({ cellSize: 4, margin: 2, scalable: true })
+      : '<span style="font-size:0.75rem;line-height:1.7;color:var(--danger);text-align:center">記録が多くなり、QRコードにできなくなりました。下の「コピー」でリンクを取り、メッセージなどでお渡しください。</span>';
     return '<div class="overlay" onclick="if(event.target===this)closeShare()">' +
-      '<div class="sheet">' +
+      '<div class="sheet" role="dialog" aria-modal="true" aria-label="メンバーを招待">' +
         '<div class="sheet-head"><h2>メンバーを招待</h2><button class="iconbtn" onclick="closeShare()" aria-label="閉じる">' + ICONS.close + '</button></div>' +
         '<div class="qrbox">' + qr + '</div>' +
         '<div class="linkrow"><input id="share-url-input" readonly value="' + esc(url) + '"><button type="button" class="btn btn-primary btn-sm" onclick="copyShareLink()">' + ICONS.copy + 'コピー</button></div>' +
-        '<p class="lede" style="font-size:12px">この証文を仲間にお渡しになるか、QRコードをお読み取りいただければ、同じ帳簿がそちらにも開きます。お支払いに変更があった際は、新しい証文を配り直していただきますようお願いいたします。</p>' +
+        '<p class="lede" style="font-size:0.78rem">この証文を仲間にお渡しになるか、QRコードをお読み取りいただければ、同じ帳簿がそちらにも開きます。お支払いに変更があった際は、新しい証文を配り直していただきますようお願いいたします。</p>' +
       '</div>' +
     '</div>';
   }
 
+
+  // Enter submits the form the field belongs to (these are plain inputs, not <form>s).
+  // Enter that merely confirms a Japanese conversion (isComposing / keyCode 229) is left alone.
+  document.addEventListener('keydown', function (e) {
+    if (e.isComposing || e.keyCode === 229) return;
+    if (e.key === 'Escape') {
+      if (ui.shareOpen) closeShare();
+      else if (ui.addOpen) closeAddPayment();
+      else if (ui.fgOpen && ui.fgStage === 'setup') closeFinalGacha();
+      return;
+    }
+    if (e.key !== 'Enter') return;
+    var t = e.target;
+    if (!t || t.tagName !== 'INPUT' || t.type === 'checkbox') return;
+    var fn = null;
+    if (t.id === 'ev-name' || t.classList.contains('member-name-input')) {
+      // On the home form, Enter moves down the list of fields and creates the event from the last one.
+      var fields = Array.prototype.slice.call(document.querySelectorAll('#ev-name, .member-name-input'));
+      var next = fields[fields.indexOf(t) + 1];
+      e.preventDefault();
+      if (next) next.focus(); else window.createNewEvent();
+      return;
+    }
+    if (t.id === 'new-member-name') fn = window.addMember;
+    else if (t.id === 'pay-label' || t.id === 'pay-amount') fn = window.submitPayment;
+    else if (t.classList.contains('rs-percent') || t.classList.contains('rs-weight')) fn = window.saveRouletteSettings;
+    if (fn) { e.preventDefault(); fn(); }
+  });
 
   window.addEventListener('hashchange', function () {
     if (ui.shareOpen || ui.addOpen) return;
