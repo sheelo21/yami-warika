@@ -315,6 +315,21 @@ await page.waitForSelector('button:has-text("ガチャを回す")');
 check('negative percentage saved', (await decodeHash()).r[0], [-30, 6]);
 check('setup text lists it', (await page.textContent('.sheet .lede')).includes('-30%・1%'), true);
 
+// --- 16. the wheel stays a full circle on a short screen, and its labels stay upright ---
+// (the result sheet is taller than a short screen; its children used to be squeezed to fit,
+// which turned the wheel into an ellipse)
+await page.setViewportSize({ width: 390, height: 600 });
+await openWith({ ...base, m: [{ i: 1, a: 'A' }, { i: 2, a: 'B' }] });
+await page.waitForSelector('.appbar-title');
+await page.click('button:has-text("精算結果")');
+await page.click('button:has-text("最終ガチャを引く")');
+await page.click('button:has-text("ガチャを回す")');
+await page.waitForSelector('.gm-machine');
+await drawOnce();
+check('result wheel is a full circle on a short screen', await page.$eval('.rw-wrap', e => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }), [220, 220]);
+check('labels are upright at rest', await page.$$eval('.rw-label', els => els.every(e => { const r = e.getBoundingClientRect(); return r.width > r.height; })), true);
+await page.setViewportSize({ width: 1280, height: 720 });
+
 check('no page errors', errors, []);
 console.log(failures ? 'FAILURES: ' + failures : 'ALL PASSED');
 await browser.close();

@@ -347,6 +347,15 @@
     border-left: 3px solid var(--gold); border-radius: 8px; padding: 12px 14px; font-size: 13.5px; line-height: 1.7;
   }
   .hint svg { flex: 0 0 auto; margin-top: 1px; }
+/* Explanatory text (.note) can be closed with its × */
+  .note { display: flex; gap: 6px; align-items: flex-start; }
+  .note .lede { flex: 1; min-width: 0; margin: 0; }
+  .note-close { flex: 0 0 auto; background: none; border: none; color: var(--text-tertiary); cursor: pointer; padding: 6px; margin: -6px -6px 0 0; border-radius: 8px; display: flex; }
+  .note-close:hover { color: var(--text); background: var(--surface-2); }
+  .toast .toast-close { display: flex; padding: 4px; opacity: 0.7; }
+  .toast .toast-close:hover { opacity: 1; }
+  .rs-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.6; }
+  .rs-summary .rs-summary-list { flex: 1; min-width: 0; overflow-wrap: anywhere; }
   .hint-close { margin-left: auto; background: none; border: none; color: inherit; opacity: 0.6; cursor: pointer; flex: 0 0 auto; }
 
   .overlay {
@@ -362,6 +371,9 @@
     .overlay { align-items: center; }
     .sheet { border-radius: 22px; max-height: 80dvh; }
   }
+  /* The sheet scrolls when its content is taller than the screen. Its children must never be
+     squeezed to fit instead — that turned the round roulette wheel into an ellipse. */
+  .sheet > * { flex-shrink: 0; }
   .sheet-head { display: flex; align-items: center; gap: 10px; }
   .sheet-head h2 { flex: 1; font-size: 17px; }
 
@@ -700,12 +712,16 @@
   function freshUi() {
     return {
       tab: 'pay', addOpen: false, editPaymentId: null, shareOpen: false, homeError: '', memberError: '',
+      homeView: 'main', homeDraft: null, homeRoulette: null,
       machine: null, roulette: null,
       fgOpen: false, fgStage: 'setup', fgPercent: null, fgWinner: null, fgRoast: null, fgDraft: null
     };
   }
   var state = null;
   var ui = freshUi();
+  // Explanatory text can be closed with its ×. A closed note stays closed (through re-renders and
+  // new events) until the page is reloaded.
+  var dismissedNotes = {};
 
   function init() {
     undoSnapshot = null;
@@ -756,10 +772,13 @@
   function showToast(msg, withUndo) {
     var root = document.getElementById('toast-root');
     root.innerHTML = '<div class="toast"><span>' + esc(msg) + '</span>' +
-      (withUndo ? '<button type="button" onclick="undoLast()">元に戻す</button>' : '') + '</div>';
+      (withUndo ? '<button type="button" onclick="undoLast()">元に戻す</button>' : '') +
+      '<button type="button" class="toast-close" onclick="closeToast()" aria-label="閉じる">' + ICONS.close + '</button></div>';
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { root.innerHTML = ''; undoSnapshot = null; }, withUndo ? 8000 : 3200);
   }
+
+  window.closeToast = function () { clearToast(); undoSnapshot = null; };
 
   // Deletions have no confirmation dialog; instead they can be taken back for a few seconds.
   // The whole state is small (it lives in the URL), so undo just restores a copy of it.
@@ -798,6 +817,7 @@
     errEl.textContent = '';
     var members = names.map(function (n, i) { return { i: i + 1, a: n }; });
     state = { v: 1, n: name, m: members, p: [], d: [] };
+    if (ui.homeRoulette && sanitizeRoulette(ui.homeRoulette)) state.r = ui.homeRoulette;
     ui = freshUi();
     commit();
   };
@@ -944,6 +964,9 @@
 
   function renderRouletteWheel(angleDeg, spinning) {
     var sectors = rouletteSectors();
+    // A wheel at rest is turned to wherever the pointer landed; the labels are counter-rotated by
+    // that same angle so the text stays upright. (While spinning they simply turn with the wheel.)
+    var restAngle = spinning ? 0 : angleDeg;
     var hueIdx = 0;
     var stops = sectors.map(function (s) {
       var color;
@@ -960,7 +983,7 @@
       // neighbor near the pointer, so its label is pulled to a further-out radius
       // to keep the two from colliding.
       var radius = s.negative ? 60 : (s.rare ? 90 : 70);
-      return '<span class="rw-label' + (s.rare ? ' rw-label-jackpot' : '') + (s.negative ? ' rw-label-lucky' : '') + '" style="transform:rotate(' + s.center + 'deg) translateY(-' + radius + 'px) rotate(-' + s.center + 'deg)">' + (s.negative ? '\u2212' + Math.abs(s.percent) : s.percent) + '%</span>';
+      return '<span class="rw-label' + (s.rare ? ' rw-label-jackpot' : '') + (s.negative ? ' rw-label-lucky' : '') + '" style="transform:rotate(' + s.center + 'deg) translateY(-' + radius + 'px) rotate(' + (0 - s.center - restAngle) + 'deg)">' + (s.negative ? '\u2212' + Math.abs(s.percent) : s.percent) + '%</span>';
     }).join('');
     var styleAttr = spinning
       ? 'background:conic-gradient(from 0deg, ' + stops + ')'
@@ -1085,23 +1108,64 @@
     ui.fgDraft = FG_ROULETTE_DEFAULT.map(function (r) { return { p: String(r.percent), w: String(r.weight) }; });
     render();
   };
-  window.saveRouletteSettings = function () {
+  // Reads the form and returns [[percent, weight], ...] — or null after showing what is wrong.
+  function readRouletteItems() {
     readRouletteDraft();
     var items = [];
     for (var i = 0; i < ui.fgDraft.length; i++) {
       var d = ui.fgDraft[i];
       var rowNo = (i + 1) + '行目：';
-      if (!/^-?\d+$/.test(d.p) || parseInt(d.p, 10) === 0 || Math.abs(parseInt(d.p, 10)) > 100) { setRouletteError(rowNo + '罰金の割合は1〜100の整数で入力してください（マイナスは-1〜-100。0にはできません）。'); return; }
-      if (!/^\d+$/.test(d.w) || parseInt(d.w, 10) < 1 || parseInt(d.w, 10) > 100) { setRouletteError(rowNo + '出やすさは1〜100の整数で入力してください。'); return; }
+      if (!/^-?\d+$/.test(d.p) || parseInt(d.p, 10) === 0 || Math.abs(parseInt(d.p, 10)) > 100) { setRouletteError(rowNo + '罰金の割合は1〜100の整数で入力してください（マイナスは-1〜-100。0にはできません）。'); return null; }
+      if (!/^\d+$/.test(d.w) || parseInt(d.w, 10) < 1 || parseInt(d.w, 10) > 100) { setRouletteError(rowNo + '出やすさは1〜100の整数で入力してください。'); return null; }
       items.push([parseInt(d.p, 10), parseInt(d.w, 10)]);
     }
-    if (items.length < FG_MIN_ITEMS || items.length > FG_MAX_ITEMS) { setRouletteError('項目は' + FG_MIN_ITEMS + '〜' + FG_MAX_ITEMS + '個で設定してください。'); return; }
-    var isDefault = items.length === FG_ROULETTE_DEFAULT.length && items.every(function (it, k) {
+    if (items.length < FG_MIN_ITEMS || items.length > FG_MAX_ITEMS) { setRouletteError('項目は' + FG_MIN_ITEMS + '〜' + FG_MAX_ITEMS + '個で設定してください。'); return null; }
+    return items;
+  }
+  function isDefaultRoulette(items) {
+    return items.length === FG_ROULETTE_DEFAULT.length && items.every(function (it, k) {
       return it[0] === FG_ROULETTE_DEFAULT[k].percent && it[1] === FG_ROULETTE_DEFAULT[k].weight;
     });
-    if (isDefault) delete state.r; else state.r = items;
+  }
+  window.saveRouletteSettings = function () {
+    var items = readRouletteItems();
+    if (!items) return;
+    if (isDefaultRoulette(items)) delete state.r; else state.r = items;
     ui.fgDraft = null; ui.fgStage = 'setup';
     commit();
+  };
+
+  // ---------- roulette settings on the first screen (before the event exists) ----------
+  // The choice waits in ui.homeRoulette and is written into the new event (state.r) when it is
+  // created, so it is shared through the link like any other setting.
+  function homeRouletteItems() { return sanitizeRoulette(ui.homeRoulette) || FG_ROULETTE_DEFAULT; }
+  function percentLabel(p) { return (p < 0 ? '\u2212' + Math.abs(p) : p) + '%'; }
+  // Going to the settings page re-renders the screen, so what was typed on the first screen is kept.
+  function readHomeDraft() {
+    var nameEl = document.getElementById('ev-name');
+    if (!nameEl) return;
+    ui.homeDraft = {
+      name: nameEl.value,
+      members: Array.prototype.map.call(document.querySelectorAll('.member-name-input'), function (el) { return el.value; })
+    };
+  }
+  window.openHomeRoulette = function () {
+    readHomeDraft();
+    ui.fgDraft = homeRouletteItems().map(function (r) { return { p: String(r.percent), w: String(r.weight) }; });
+    ui.homeView = 'roulette';
+    render();
+    window.scrollTo(0, 0);
+  };
+  window.saveHomeRoulette = function () {
+    var items = readRouletteItems();
+    if (!items) return;
+    ui.homeRoulette = isDefaultRoulette(items) ? null : items;
+    ui.fgDraft = null; ui.homeView = 'main';
+    render();
+  };
+  window.cancelHomeRoulette = function () {
+    ui.fgDraft = null; ui.homeView = 'main';
+    render();
   };
 
   window.startFinalGachaMachine = function () {
@@ -1185,11 +1249,18 @@
   window.confirmReset = function () {
     if (window.confirm('このイベントの記録をすべて消して、最初の画面に戻ります。\n共有リンクを控えていない場合、元に戻すことはできません。よろしいですか？')) resetHome();
   };
-  window.dismissHint = function () {
-    ui._hintDismissed = true;
-    var el = document.getElementById('event-hint');
+  // A closable explanation: the text plus a × that removes it and remembers that it was closed.
+  function noteHtml(key, text, style) {
+    if (dismissedNotes[key]) return '';
+    return '<div class="note" data-note="' + key + '"><p class="lede"' + (style ? ' style="' + style + '"' : '') + '>' + text + '</p>' +
+      '<button type="button" class="note-close" onclick="dismissNote(\'' + key + '\')" aria-label="この説明を閉じる">' + ICONS.close + '</button></div>';
+  }
+  window.dismissNote = function (key) {
+    dismissedNotes[key] = true;
+    var el = document.querySelector('[data-note="' + key + '"]');
     if (el) el.remove();
   };
+  window.dismissHint = function () { window.dismissNote('hint'); };
 
   // ---------- render ----------
   function render() {
@@ -1197,24 +1268,37 @@
   }
 
   function renderHome() {
+    if (ui.homeView === 'roulette') return renderHomeRoulettePage();
     var err = ui.homeError ? '<div class="err-text" style="margin-bottom:2px">' + esc(ui.homeError) + '</div>' : '';
+    var draft = ui.homeDraft || { name: '', members: [] };
+    var memberValues = draft.members.slice();
+    while (memberValues.length < 2) memberValues.push('');
+    var memberRows = memberValues.map(function (v, i) {
+      return i < 2
+        ? '<div class="row"><input class="input member-name-input" maxlength="20" placeholder="名前" value="' + esc(v) + '"></div>'
+        : '<div class="row"><input class="input member-name-input" maxlength="20" placeholder="名前" style="flex:1" value="' + esc(v) + '">' +
+          '<button type="button" class="chip-remove" style="margin:0;width:30px;height:30px" onclick="this.parentElement.remove()" aria-label="削除">' + ICONS.close + '</button></div>';
+    }).join('');
+    var percents = homeRouletteItems().map(function (r) { return percentLabel(r.percent); }).join('・');
     return '' +
       '<div class="wrap">' +
         '<div class="appbar"><div class="brand"><span class="brand-mark"><span></span><span></span></span><span class="brand-name">闇ワリカ</span></div></div>' +
         '<div class="container">' +
           '<div style="display:flex;flex-direction:column;gap:6px;padding:6px 2px 0">' +
             '<h1 style="font-size:22px;color:oklch(93% 0.1 86);-webkit-text-stroke:0.3px oklch(93% 0.1 86);text-shadow:0 0 16px oklch(80% 0.14 84 / 0.45), 0 1px 2px oklch(0% 0 0 / 0.6)">さあ、清算の刻でございます。</h1>' +
-            '<p class="lede">面倒なご登録は不要でございます。証文（リンク）を一枚お回しいただくだけで、皆様はすぐにテーブルにお揃いになります。</p>' +
+            noteHtml('home-intro', '面倒なご登録は不要でございます。証文（リンク）を一枚お回しいただくだけで、皆様はすぐにテーブルにお揃いになります。') +
           '</div>' +
           err +
           '<div class="card" style="display:flex;flex-direction:column;gap:16px">' +
-            '<div class="field"><label for="ev-name">イベント名</label><input id="ev-name" class="input" maxlength="40" placeholder="例：沖縄旅行"></div>' +
+            '<div class="field"><label for="ev-name">イベント名</label><input id="ev-name" class="input" maxlength="40" placeholder="例：沖縄旅行" value="' + esc(draft.name) + '"></div>' +
             '<div class="field"><label>メンバー</label>' +
-              '<div id="member-rows" class="rows">' +
-                '<div class="row"><input class="input member-name-input" maxlength="20" placeholder="名前"></div>' +
-                '<div class="row"><input class="input member-name-input" maxlength="20" placeholder="名前"></div>' +
-              '</div>' +
+              '<div id="member-rows" class="rows">' + memberRows + '</div>' +
               '<button type="button" class="btn-text" onclick="addMemberRow()">' + ICONS.plus + 'メンバーを追加</button>' +
+            '</div>' +
+            '<div class="field"><label>最終ガチャのルーレット</label>' +
+              '<div class="rs-summary"><span class="rs-summary-list">' + percents + '</span>' +
+                '<span class="badge ' + (ui.homeRoulette ? 'badge-success' : 'badge-accent') + '">' + (ui.homeRoulette ? '変更済み' : '初期設定') + '</span></div>' +
+              '<button type="button" class="btn-text" onclick="openHomeRoulette()">ルーレットの％を設定する</button>' +
             '</div>' +
             '<div id="create-err" class="err-text"></div>' +
             '<button type="button" class="btn btn-primary btn-block" onclick="createNewEvent()">イベントを作成する</button>' +
@@ -1267,8 +1351,8 @@
   }
 
   function renderHint() {
-    if (ui._hintDismissed) return '';
-    return '<div class="hint" id="event-hint">' + ICONS.info +
+    if (dismissedNotes.hint) return '';
+    return '<div class="hint" id="event-hint" data-note="hint">' + ICONS.info +
       '<span>お支払いを記録されるたびに、清算は自動で算出されます。内容を変更された際は、新しい証文を皆様にお配りいただきますようお願いいたします。</span>' +
       '<button class="hint-close" onclick="dismissHint()" aria-label="閉じる">' + ICONS.close + '</button>' +
     '</div>';
@@ -1369,7 +1453,7 @@
     }
     return '<div class="fg-card">' +
       '<div class="fg-head">' + ICONS.dice + '<h3>最後に、運命をお試しになりますか？</h3></div>' +
-      '<p class="lede" style="font-size:13.5px">運命が二度巡ります。まずは奢っていただく方、続いて罰金の割合——マイナスが出れば、一発逆転もございます。</p>' +
+      noteHtml('fg-card', '運命が二度巡ります。まずは奢っていただく方、続いて罰金の割合——マイナスが出れば、一発逆転もございます。', 'font-size:13.5px') +
       '<button type="button" class="btn btn-secondary btn-block" onclick="openFinalGacha()">最終ガチャを引く</button>' +
     '</div>';
   }
@@ -1400,14 +1484,16 @@
     var percents = fgRoulette().map(function (r) { return r.percent; });
     return '' +
       '<div class="sheet-head"><h2>最終ガチャ</h2>' + fgCloseButton() + '</div>' +
-      '<p class="lede" style="font-size:13.5px">まずは全' + state.m.length + '名様の中から、ガチャでお一人（対象者）が選ばれます。続いてルーレットが、罰金の割合（' + percents.join('%・') + '%のいずれか）を合計金額の中からお選びいたします。対象者は、その金額を皆様に奢ることになります。</p>' +
-      '<p class="lede" style="font-size:13.5px">ただし、マイナスが出れば一発逆転——対象者が金額を受け取り、対象者以外の皆様で割り勘してお支払いいたします。</p>' +
-      '<p class="lede" style="font-size:12.5px">※ガチャのレバーを引いたあとは、結果が出るまで途中で閉じられません。引き直しは、結果を反映したあとに1回だけ可能です。</p>' +
+      noteHtml('fg-setup-1', 'まずは全' + state.m.length + '名様の中から、ガチャでお一人（対象者）が選ばれます。続いてルーレットが、罰金の割合（' + percents.join('%・') + '%のいずれか）を合計金額の中からお選びいたします。対象者は、その金額を皆様に奢ることになります。', 'font-size:13.5px') +
+      noteHtml('fg-setup-2', 'ただし、マイナスが出れば一発逆転——対象者が金額を受け取り、対象者以外の皆様で割り勘してお支払いいたします。', 'font-size:13.5px') +
+      noteHtml('fg-setup-3', '※ガチャのレバーを引いたあとは、結果が出るまで途中で閉じられません。引き直しは、結果を反映したあとに1回だけ可能です。', 'font-size:12.5px') +
       '<button type="button" class="btn btn-primary btn-block" onclick="startFinalGachaMachine()">' + ICONS.dice + 'ガチャを回す</button>' +
       '<div class="row" style="justify-content:center"><button type="button" class="btn-text" onclick="openRouletteSettings()">ルーレットの％を設定する</button></div>';
   }
 
-  function renderRouletteSettings() {
+  // The editable list of roulette entries. Used by the settings sheet inside an event and by the
+  // settings page on the first screen; scope only changes the wording of the first note.
+  function renderRouletteEditor(scope) {
     var draft = ui.fgDraft || [];
     var chances = rouletteChanceTexts(draft.map(function (d) { return d.w; }));
     var rows = draft.map(function (d, i) {
@@ -1418,10 +1504,12 @@
         '<button type="button" class="chip-remove" style="margin:0;width:30px;height:30px" onclick="removeRouletteRow(' + i + ')" aria-label="この項目を削除">' + ICONS.close + '</button>' +
       '</div>';
     }).join('');
+    var intro = scope === 'home'
+      ? 'ルーレットに載せる罰金の割合（%）と、その出やすさを決められます。出やすさは数字が大きいほど出やすくなります（1〜100）。ここで決めた設定は、これから作るイベントに使われ、共有した皆様にも引き継がれます（あとから最終ガチャの画面でも変えられます）。'
+      : 'ルーレットに載せる罰金の割合（%）と、その出やすさを決められます。出やすさは数字が大きいほど出やすくなります（1〜100）。このイベントを共有した皆様にも、同じ設定が引き継がれます。';
     return '' +
-      '<div class="sheet-head"><h2>ルーレットの設定</h2>' + fgCloseButton() + '</div>' +
-      '<p class="lede" style="font-size:13.5px">ルーレットに載せる罰金の割合（%）と、その出やすさを決められます。出やすさは数字が大きいほど出やすくなります（1〜100）。このイベントを共有した皆様にも、同じ設定が引き継がれます。</p>' +
-      '<p class="lede" style="font-size:13.5px">割合をマイナス（例：-20）にすると「一発逆転」になります。対象者がその金額を受け取り、対象者以外の皆様で割り勘してお支払いします。</p>' +
+      noteHtml('rs-1', intro, 'font-size:13.5px') +
+      noteHtml('rs-2', '割合をマイナス（例：-20）にすると「一発逆転」になります。対象者がその金額を受け取り、対象者以外の皆様で割り勘してお支払いします。', 'font-size:13.5px') +
       '<div class="rows">' +
         '<div class="rs-grid rs-head"><span>罰金の割合（%）</span><span>出やすさ</span><span>出る確率</span><span></span></div>' +
         rows +
@@ -1430,9 +1518,30 @@
       '<div class="row" style="justify-content:space-between">' +
         '<button type="button" class="btn-text" onclick="addRouletteRow()">' + ICONS.plus + '項目を追加</button>' +
         '<button type="button" class="btn-text" onclick="resetRouletteDraft()">初期値に戻す</button>' +
-      '</div>' +
+      '</div>';
+  }
+
+  function renderRouletteSettings() {
+    return '' +
+      '<div class="sheet-head"><h2>ルーレットの設定</h2>' + fgCloseButton() + '</div>' +
+      renderRouletteEditor('event') +
       '<button type="button" class="btn btn-primary btn-block" onclick="saveRouletteSettings()">この設定で保存する</button>' +
       '<div class="row" style="justify-content:center"><button type="button" class="btn-text" onclick="cancelRouletteSettings()">戻る</button></div>';
+  }
+
+  function renderHomeRoulettePage() {
+    return '' +
+      '<div class="wrap">' +
+        '<div class="appbar">' +
+          '<button class="iconbtn" onclick="cancelHomeRoulette()" aria-label="戻る">' + ICONS.back + '</button>' +
+          '<div class="appbar-title">ルーレットの設定</div>' +
+        '</div>' +
+        '<div class="container">' +
+          renderRouletteEditor('home') +
+          '<button type="button" class="btn btn-primary btn-block" onclick="saveHomeRoulette()">この設定で保存する</button>' +
+          '<div class="row" style="justify-content:center"><button type="button" class="btn-text" onclick="cancelHomeRoulette()">戻る</button></div>' +
+        '</div>' +
+      '</div>';
   }
 
   function renderFgLoserResult() {
@@ -1476,7 +1585,7 @@
       banner +
       '<div class="gacha-breakdown">' + breakdown + '</div>' +
       '<button type="button" class="btn btn-primary btn-block" onclick="confirmFinalGacha()">この結果を反映する</button>' +
-      '<p class="lede" style="font-size:13px;text-align:center">結果は覚悟してお受けくださいませ。引き直しは、反映したあとに1回だけ可能です。</p>';
+      noteHtml('fg-result', '結果は覚悟してお受けくださいませ。引き直しは、反映したあとに1回だけ可能です。', 'font-size:13px;text-align:center');
   }
 
   function renderAddPaymentBottom() {
@@ -1587,7 +1696,7 @@
         '<div class="sheet-head"><h2>メンバーを招待</h2><button class="iconbtn" onclick="closeShare()" aria-label="閉じる">' + ICONS.close + '</button></div>' +
         '<div class="qrbox">' + qr + '</div>' +
         '<div class="linkrow"><input id="share-url-input" readonly value="' + esc(url) + '"><button type="button" class="btn btn-primary btn-sm" onclick="copyShareLink()">' + ICONS.copy + 'コピー</button></div>' +
-        '<p class="lede" style="font-size:13.5px">この証文を仲間にお渡しになるか、QRコードをお読み取りいただければ、同じ帳簿がそちらにも開きます。お支払いに変更があった際は、新しい証文を配り直していただきますようお願いいたします。</p>' +
+        noteHtml('share', 'この証文を仲間にお渡しになるか、QRコードをお読み取りいただければ、同じ帳簿がそちらにも開きます。お支払いに変更があった際は、新しい証文を配り直していただきますようお願いいたします。', 'font-size:13.5px') +
       '</div>' +
     '</div>';
   }
@@ -1598,7 +1707,8 @@
   document.addEventListener('keydown', function (e) {
     if (e.isComposing || e.keyCode === 229) return;
     if (e.key === 'Escape') {
-      if (ui.shareOpen) closeShare();
+      if (!state && ui.homeView === 'roulette') cancelHomeRoulette();
+      else if (ui.shareOpen) closeShare();
       else if (ui.addOpen) closeAddPayment();
       else if (ui.fgOpen && ui.fgStage === 'setup') closeFinalGacha();
       return;
@@ -1617,7 +1727,7 @@
     }
     if (t.id === 'new-member-name') fn = window.addMember;
     else if (t.id === 'pay-label' || t.id === 'pay-amount') fn = window.submitPayment;
-    else if (t.classList.contains('rs-percent') || t.classList.contains('rs-weight')) fn = window.saveRouletteSettings;
+    else if (t.classList.contains('rs-percent') || t.classList.contains('rs-weight')) fn = (!state && ui.homeView === 'roulette') ? window.saveHomeRoulette : window.saveRouletteSettings;
     if (fn) { e.preventDefault(); fn(); }
   });
 
